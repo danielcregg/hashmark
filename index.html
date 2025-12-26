@@ -970,7 +970,6 @@
   let lastContent = ''
 
   // Mermaid lazy loading
-  let mermaidLoaded = false
   let mermaidInitialized = false
   let mermaidTheme = 'default'
   const MERMAID_SUMMARY_MAX = 120
@@ -1517,54 +1516,73 @@
     }
   })
 
-  // Lazy load mermaid
-  async function loadMermaid() {
-    if (mermaidLoaded) return
-    mermaidLoaded = true
-    const script = document.createElement('script')
-    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js'
-    script.onload = () => {
-      renderMermaid()
-    }
-    document.head.appendChild(script)
+  // Lazy load mermaid with promise
+  let mermaidLoadPromise = null
+
+  function loadMermaid() {
+    if (mermaidLoadPromise) return mermaidLoadPromise
+    if (typeof mermaid !== 'undefined') return Promise.resolve()
+
+    mermaidLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js'
+      script.onload = () => {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: getEffectiveTheme() === 'dark' ? 'dark' : 'default'
+        })
+        mermaidInitialized = true
+        resolve()
+      }
+      script.onerror = reject
+      document.head.appendChild(script)
+    })
+    return mermaidLoadPromise
   }
 
-  function renderMermaid() {
+  async function renderMermaid() {
     const codeBlocks = preview.querySelectorAll('pre code.language-mermaid')
     if (!codeBlocks.length) return
 
-    if (typeof mermaid === 'undefined') {
-      loadMermaid()
+    // Wait for mermaid to load
+    try {
+      await loadMermaid()
+    } catch (e) {
+      console.error('Failed to load Mermaid:', e)
       return
     }
 
     const effectiveTheme = getEffectiveTheme()
     const nextTheme = effectiveTheme === 'dark' ? 'dark' : 'default'
 
-    if (!mermaidInitialized || mermaidTheme !== nextTheme) {
+    if (mermaidTheme !== nextTheme) {
       mermaid.initialize({
         startOnLoad: false,
         theme: nextTheme
       })
-      mermaidInitialized = true
       mermaidTheme = nextTheme
     }
 
-    const targets = []
     const conversions = []
     codeBlocks.forEach((code) => {
       const pre = code.parentElement
       const diagramText = (code.textContent ?? '').trim()
       const container = document.createElement('div')
       container.className = 'mermaid'
+      const id = 'mermaid-' + Math.random().toString(36).substr(2, 9)
+      container.id = id
       container.textContent = diagramText
       pre.replaceWith(container)
-      targets.push(container)
-      conversions.push({ container, pre, text: diagramText })
+      conversions.push({ container, pre, text: diagramText, id })
     })
 
+    // Use mermaid.run() for newer versions, fallback to init()
     try {
-      mermaid.init({ startOnLoad: false }, targets)
+      if (typeof mermaid.run === 'function') {
+        await mermaid.run({ nodes: conversions.map(c => c.container) })
+      } else {
+        mermaid.init({ startOnLoad: false }, conversions.map(c => c.container))
+      }
     } catch (err) {
       const diagramSummary = conversions
         .map(({ text }, idx) => `#${idx + 1}: ${text.slice(0, MERMAID_SUMMARY_MAX)}`)
