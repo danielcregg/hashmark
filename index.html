@@ -1555,17 +1555,49 @@
   const renderer = new marked.Renderer()
 
   // Custom code block renderer for highlight.js
-  renderer.code = function (code, language) {
-    if (language === 'mermaid') {
+  // Handle both old (code, language) and new ({text, lang}) marked.js API
+  renderer.code = function (codeOrObj, language) {
+    let code, lang
+    if (typeof codeOrObj === 'object' && codeOrObj !== null) {
+      // New marked.js v11+ API: first param is {text, lang}
+      code = codeOrObj.text || ''
+      lang = codeOrObj.lang || ''
+    } else {
+      // Old API: separate code and language params
+      code = codeOrObj || ''
+      lang = language || ''
+    }
+
+    if (lang === 'mermaid') {
       return `<pre><code class="language-mermaid">${code}</code></pre>`
     }
-    if (typeof hljs !== 'undefined' && language && hljs.getLanguage(language)) {
+    if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
       try {
-        const highlighted = hljs.highlight(code, { language }).value
-        return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`
+        const highlighted = hljs.highlight(code, { language: lang }).value
+        return `<pre><code class="hljs language-${lang}">${highlighted}</code></pre>`
       } catch (e) { }
     }
     return `<pre><code>${code}</code></pre>`
+  }
+
+  // Custom heading renderer to generate IDs for anchor links
+  renderer.heading = function (textOrObj, level, raw) {
+    let text
+    if (typeof textOrObj === 'object' && textOrObj !== null) {
+      // New marked.js v11+ API
+      text = textOrObj.text || ''
+      level = textOrObj.depth || level || 1
+    } else {
+      text = textOrObj || ''
+    }
+    // Generate GitHub-style anchor ID: lowercase, spaces to hyphens, remove special chars
+    const id = text.toLowerCase()
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/[^\w\s-]/g, '') // Remove special chars
+      .replace(/\s+/g, '-') // Spaces to hyphens
+      .replace(/-+/g, '-') // Collapse multiple hyphens
+      .trim()
+    return `<h${level} id="${id}">${text}</h${level}>\n`
   }
 
   marked.setOptions({
@@ -2051,7 +2083,30 @@ mindmap
   editor.addEventListener('input', debounce(100, renderMarkdown))
 
   addEventListener('DOMContentLoaded', load)
-  addEventListener('hashchange', load)
+
+  // Handle hashchange - but distinguish between content hashes and anchor links
+  addEventListener('hashchange', (event) => {
+    const newHash = location.hash.slice(1)
+
+    // Check if this looks like an anchor link (simple text, no special chars typical of Base64)
+    // Compressed hashes have Base64-like patterns with uppercase, numbers, +, /, =
+    const isAnchorLink = /^[a-z0-9-]+$/i.test(newHash) && newHash.length < 100 && !newHash.includes('=')
+
+    if (isAnchorLink) {
+      // This is an internal anchor link - scroll to the element
+      const targetId = newHash.replace(/-/g, '-') // GitHub-style anchor IDs
+      const targetElement = document.getElementById(targetId) ||
+        document.querySelector(`[id="${targetId}"]`) ||
+        document.querySelector(`[name="${targetId}"]`)
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth' })
+      }
+      return // Don't reload content
+    }
+
+    // Otherwise, treat as compressed content hash
+    load()
+  })
 
   async function load() {
     // Check for mode query parameter
@@ -2059,14 +2114,18 @@ mindmap
     const mode = urlParams.get('mode')
     const isNew = urlParams.get('new') === 'true'
 
+    // Check if the hash looks like compressed content (long Base64-like string)
+    const hash = location.hash.slice(1)
+    const isCompressedContent = hash.length > 20 || hash.includes('=') || /[A-Z]/.test(hash)
+
     try {
       if (isNew) {
         // New document - start fresh, ignore localStorage
         editor.value = ''
         editor.focus()
-      } else if (location.hash !== '') {
+      } else if (hash !== '' && isCompressedContent) {
         await set(location.hash)
-      } else {
+      } else if (!hash) {
         await set(localStorage.getItem('hash') ?? '')
         if (editor.value) history.replaceState({}, '', await get())
         editor.focus()
