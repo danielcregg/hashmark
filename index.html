@@ -598,12 +598,12 @@
     try {
       mermaid.init(undefined, targets)
     } catch (err) {
-      console.error('Mermaid render error:', err)
+      const diagramSummary = conversions.map(({ pre }, idx) => `#${idx + 1}: ${pre.textContent}`).join(' | ')
+      console.error('Mermaid render error:', err, 'Diagrams:', diagramSummary)
       conversions.forEach(({ container, pre }) => {
-        if (container.parentNode) {
-          container.replaceWith(pre)
-        } else {
-          preview.appendChild(pre)
+        const parent = container.parentNode ?? preview
+        if (parent) {
+          parent.replaceChild(pre, container)
         }
       })
     }
