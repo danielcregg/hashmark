@@ -82,6 +82,10 @@
     }
   }
 
+  #btn-share {
+    margin-left: auto;
+  }
+
   .container {
     display: flex;
     height: calc(100vh - 42px);
@@ -323,6 +327,7 @@
   <button id="btn-edit" class="active">Edit</button>
   <button id="btn-split">Split</button>
   <button id="btn-preview">Preview</button>
+  <button id="btn-share">📤 Share</button>
 </div>
 
 <div class="container">
@@ -342,6 +347,7 @@
   const btnEdit = document.getElementById('btn-edit')
   const btnSplit = document.getElementById('btn-split')
   const btnPreview = document.getElementById('btn-preview')
+  const btnShare = document.getElementById('btn-share')
 
   // Configure marked
   marked.setOptions({
@@ -364,6 +370,63 @@
   btnEdit.addEventListener('click', () => setView('edit'))
   btnSplit.addEventListener('click', () => setView('split'))
   btnPreview.addEventListener('click', () => setView('preview'))
+
+  // Share button handler
+  btnShare.addEventListener('click', async () => {
+    const url = window.location.href
+    const title = document.title
+
+    // Try Web Share API first (mobile devices)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: title,
+          text: 'Check out this markdown document',
+          url: url
+        })
+        return
+      } catch (err) {
+        // User cancelled or share failed, fall through to clipboard
+        if (err.name !== 'AbortError') {
+          console.log('Share failed:', err)
+        }
+      }
+    }
+
+    // Fallback to clipboard
+    try {
+      await navigator.clipboard.writeText(url)
+      // Visual feedback
+      const originalText = btnShare.textContent
+      btnShare.textContent = '✓ Copied!'
+      btnShare.style.background = '#2da44e'
+      btnShare.style.borderColor = '#2da44e'
+      setTimeout(() => {
+        btnShare.textContent = originalText
+        btnShare.style.background = ''
+        btnShare.style.borderColor = ''
+      }, 2000)
+    } catch (err) {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea')
+      textarea.value = url
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      try {
+        document.execCommand('copy')
+        const originalText = btnShare.textContent
+        btnShare.textContent = '✓ Copied!'
+        setTimeout(() => {
+          btnShare.textContent = originalText
+        }, 2000)
+      } catch (e) {
+        alert('Failed to copy. Please copy manually: ' + url)
+      }
+      document.body.removeChild(textarea)
+    }
+  })
 
   // Restore view mode
   const savedView = localStorage.getItem('viewMode')
@@ -429,18 +492,51 @@
     writer.write(byteArray)
     writer.close()
     const buffer = await new Response(stream.readable).arrayBuffer()
-    return new Uint8Array(buffer).toBase64().replace(/\+/g, "-").replace(/\//g, "_")
+    const uint8Array = new Uint8Array(buffer)
+
+    // Use native toBase64 if available, otherwise fallback
+    if (typeof uint8Array.toBase64 === 'function') {
+      return uint8Array.toBase64().replace(/\+/g, "-").replace(/\//g, "_")
+    } else {
+      // Fallback for browsers without toBase64 support
+      const binary = Array.from(uint8Array, byte => String.fromCharCode(byte)).join('')
+      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")
+    }
   }
 
   async function decompress(b64) {
     if (!b64) return ''
-    const byteArray = Uint8Array.fromBase64(b64.replace(/-/g, "+").replace(/_/g, "/"))
-    const stream = new DecompressionStream('deflate-raw')
-    const writer = stream.writable.getWriter()
-    writer.write(byteArray)
-    writer.close()
-    const buffer = await new Response(stream.readable).arrayBuffer()
-    return new TextDecoder().decode(buffer)
+
+    try {
+      // Restore standard base64 format
+      const standardB64 = b64.replace(/-/g, "+").replace(/_/g, "/")
+
+      let byteArray
+      // Use native fromBase64 if available, otherwise fallback
+      if (typeof Uint8Array.fromBase64 === 'function') {
+        byteArray = Uint8Array.fromBase64(standardB64)
+      } else {
+        // Fallback for browsers without fromBase64 support
+        // Add padding if needed
+        const padding = (4 - (standardB64.length % 4)) % 4
+        const paddedB64 = standardB64 + '='.repeat(padding)
+        const binary = atob(paddedB64)
+        byteArray = new Uint8Array(binary.length)
+        for (let i = 0; i < binary.length; i++) {
+          byteArray[i] = binary.charCodeAt(i)
+        }
+      }
+
+      const stream = new DecompressionStream('deflate-raw')
+      const writer = stream.writable.getWriter()
+      writer.write(byteArray)
+      writer.close()
+      const buffer = await new Response(stream.readable).arrayBuffer()
+      return new TextDecoder().decode(buffer)
+    } catch (e) {
+      console.error('Decompression error:', e)
+      return ''
+    }
   }
 
   function debounce(ms, fn) {
