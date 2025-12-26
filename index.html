@@ -1519,7 +1519,7 @@
   editor.addEventListener('input', updateLineNumbers)
 
   // Scroll sync between editor and preview in split view
-  const editorPane = document.querySelector('.editor-pane')
+
   const previewPane = document.querySelector('.preview-pane')
   let scrollSyncLock = false
 
@@ -1543,12 +1543,12 @@
     })
   }
 
-  editorPane.addEventListener('scroll', () => {
-    syncScroll(editorPane, previewPane)
+  editor.addEventListener('scroll', () => {
+    syncScroll(editor, previewPane)
   })
 
   previewPane.addEventListener('scroll', () => {
-    syncScroll(previewPane, editorPane)
+    syncScroll(previewPane, editor)
   })
 
   // Configure marked with custom renderer
