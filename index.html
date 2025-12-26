@@ -1887,9 +1887,9 @@ mindmap
     )
 
     if (confirmed) {
-      // Get base URL without hash
+      // Get base URL without hash, add ?new=true to skip localStorage
       const baseUrl = window.location.origin + window.location.pathname
-      window.open(baseUrl, '_blank')
+      window.open(baseUrl + '?new=true', '_blank')
     }
   })
 
@@ -2057,9 +2057,14 @@ mindmap
     // Check for mode query parameter
     const urlParams = new URLSearchParams(window.location.search)
     const mode = urlParams.get('mode')
+    const isNew = urlParams.get('new') === 'true'
 
     try {
-      if (location.hash !== '') {
+      if (isNew) {
+        // New document - start fresh, ignore localStorage
+        editor.value = ''
+        editor.focus()
+      } else if (location.hash !== '') {
         await set(location.hash)
       } else {
         await set(localStorage.getItem('hash') ?? '')
