@@ -229,6 +229,10 @@
     padding: 0;
   }
 
+  .preview .mermaid {
+    margin-bottom: 16px;
+  }
+
   .preview table {
     border-collapse: collapse;
     width: 100%;
@@ -340,6 +344,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>
   const editor = document.querySelector('.editor')
   const preview = document.querySelector('.preview')
@@ -348,6 +353,7 @@
   const btnSplit = document.getElementById('btn-split')
   const btnPreview = document.getElementById('btn-preview')
   const btnShare = document.getElementById('btn-share')
+  const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)')
 
   // Configure marked
   marked.setOptions({
@@ -370,6 +376,7 @@
   btnEdit.addEventListener('click', () => setView('edit'))
   btnSplit.addEventListener('click', () => setView('split'))
   btnPreview.addEventListener('click', () => setView('preview'))
+  prefersDarkMode.addEventListener('change', renderMarkdown)
 
   // Share button handler
   btnShare.addEventListener('click', async () => {
@@ -436,6 +443,7 @@
   function renderMarkdown() {
     const markdown = editor.value
     preview.innerHTML = marked.parse(markdown)
+    renderMermaid()
     updateTitle()
   }
 
@@ -557,4 +565,25 @@
       editor.selectionStart = editor.selectionEnd = start + 2
     }
   })
+
+  function renderMermaid() {
+    if (typeof mermaid === 'undefined') return
+    const codeBlocks = preview.querySelectorAll('pre code.language-mermaid')
+    if (!codeBlocks.length) return
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: prefersDarkMode.matches ? 'dark' : 'default'
+    })
+
+    codeBlocks.forEach((code) => {
+      const pre = code.parentElement
+      const container = document.createElement('div')
+      container.className = 'mermaid'
+      container.textContent = code.textContent
+      pre.replaceWith(container)
+    })
+
+    mermaid.init(undefined, preview.querySelectorAll('.mermaid'))
+  }
 </script>
