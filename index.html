@@ -239,6 +239,10 @@
     padding: 0;
   }
 
+  .preview .mermaid {
+    margin-bottom: 16px;
+  }
+
   .preview table {
     border-collapse: collapse;
     width: 100%;
@@ -360,6 +364,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>
   const editor = document.querySelector('.editor')
   const preview = document.querySelector('.preview')
@@ -370,6 +375,10 @@
   const btnShare = document.getElementById('btn-share')
   const formatButtons = document.querySelectorAll('[data-format]')
   const DEFAULT_LINK_URL = 'https://example.com'
+  const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)')
+  let mermaidInitialized = false
+  let mermaidTheme = 'default'
+  const MERMAID_SUMMARY_MAX = 120
 
   // Configure marked
   marked.setOptions({
@@ -392,6 +401,7 @@
   btnEdit.addEventListener('click', () => setView('edit'))
   btnSplit.addEventListener('click', () => setView('split'))
   btnPreview.addEventListener('click', () => setView('preview'))
+  prefersDarkMode.addEventListener('change', renderMarkdown)
 
   const formatActions = {
     bold: () => applyWrap('**', '**', 'bold text'),
@@ -472,6 +482,7 @@
   function renderMarkdown() {
     const markdown = editor.value
     preview.innerHTML = marked.parse(markdown)
+    renderMermaid()
     updateTitle()
   }
 
@@ -614,4 +625,50 @@
       editor.selectionStart = editor.selectionEnd = start + 2
     }
   })
+
+  function renderMermaid() {
+    if (typeof mermaid === 'undefined') return
+    const codeBlocks = preview.querySelectorAll('pre code.language-mermaid')
+    if (!codeBlocks.length) return
+
+    const nextTheme = prefersDarkMode.matches ? 'dark' : 'default'
+    if (!mermaidInitialized || mermaidTheme !== nextTheme) {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: nextTheme
+      })
+      mermaidInitialized = true
+      mermaidTheme = nextTheme
+    }
+
+    const targets = []
+    const conversions = []
+    codeBlocks.forEach((code) => {
+      const pre = code.parentElement
+      const diagramText = (code.textContent ?? '').trim()
+      const container = document.createElement('div')
+      container.className = 'mermaid'
+      container.textContent = diagramText
+      pre.replaceWith(container)
+      targets.push(container)
+      conversions.push({ container, pre, text: diagramText })
+    })
+
+    try {
+      mermaid.init({ startOnLoad: false }, targets)
+    } catch (err) {
+      const diagramSummary = conversions
+        .map(({ text }, idx) => `#${idx + 1}: ${text.slice(0, MERMAID_SUMMARY_MAX)}`)
+        .join(' | ')
+      console.error('Mermaid render error:', err, 'Diagrams:', diagramSummary)
+      conversions.forEach(({ container, pre }) => {
+        const parent = container.parentNode
+        if (parent) {
+          parent.replaceChild(pre, container)
+        } else if (preview && preview.isConnected) {
+          preview.appendChild(pre)
+        }
+      })
+    }
+  }
 </script>

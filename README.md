@@ -12,6 +12,7 @@ A _minimalist_ markdown editor that lives entirely in your browser with real-tim
   - **Edit** - Focus on writing
   - **Preview** - See the fully rendered document
   - **Split** - Edit and preview side-by-side
+- 📊 **Mermaid Diagrams** - Render `mermaid` code blocks directly in preview
 - 📤 **Easy Sharing** - One-click share button uses native mobile sharing or copies URL to clipboard
 - 🗜️ **Compression magic** - Your markdown gets compressed with deflate for efficient URL storage
 - 🔗 **URL-based sharing** - Share your rendered documents by copying the URL
