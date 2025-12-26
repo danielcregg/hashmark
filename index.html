@@ -77,6 +77,10 @@
     align-items: center;
   }
 
+  .toolbar-group:last-child {
+    margin-left: auto;
+  }
+
   .toolbar button.active {
     background: #0969da;
     color: #fff;
@@ -341,7 +345,9 @@
     <button data-format="code" title="Inline code (`code`)" aria-label="Code">Code</button>
     <button data-format="link" title="Link ([text](url))" aria-label="Link">Link</button>
   </div>
-  <button id="btn-share">📤 Share</button>
+  <div class="toolbar-group">
+    <button id="btn-share">📤 Share</button>
+  </div>
 </div>
 
 <div class="container">
@@ -390,7 +396,7 @@
     bold: () => applyWrap('**', '**', 'bold text'),
     italic: () => applyWrap('_', '_', 'italic text'),
     code: () => applyWrap('`', '`', 'code'),
-    link: () => applyWrap('[', '](url)', 'link text')
+    link: () => applyWrap('[', '](https://example.com)', 'link text')
   }
 
   formatButtons.forEach((button) => {
