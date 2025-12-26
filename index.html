@@ -1525,7 +1525,7 @@
 
   function syncScroll(source, target) {
     if (scrollSyncLock) return
-    if (body.className !== 'view-split') return
+    if (!body.classList.contains('view-split')) return
 
     scrollSyncLock = true
 
@@ -2051,7 +2051,7 @@ mindmap
   // Auto-detect unfenced Mermaid diagrams
   function autoWrapMermaid(markdown) {
     // Common Mermaid diagram keywords at the start of a line
-    const mermaidKeywords = /^(graph\s|flowchart\s|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie\s|journey|gitGraph|mindmap|timeline|quadrantChart|xychart|sankey|packet|block)/m
+    const mermaidKeywords = /^(graph\s|flowchart\s|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie\s|journey|gitGraph|mindmap|timeline|quadrantChart|xychart|sankey|packet|block)/
 
     // If content starts with a mermaid keyword and isn't already fenced
     const trimmed = markdown.trim()
@@ -2077,7 +2077,6 @@ mindmap
     saveToHistory()
     showSaving()
     save().then(showSaved)
-    renderMarkdown()
   }))
 
   editor.addEventListener('input', debounce(100, renderMarkdown))
@@ -2125,9 +2124,9 @@ mindmap
         editor.focus()
       } else if (hash !== '' && isCompressedContent) {
         await set(location.hash)
-      } else if (!hash) {
+      } else {
         await set(localStorage.getItem('hash') ?? '')
-        if (editor.value) history.replaceState({}, '', await get())
+        if (editor.value && !hash) history.replaceState({}, '', await get())
         editor.focus()
       }
     } catch (e) {
