@@ -2,6 +2,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Markdown Editor</title>
+
+<!-- Highlight.js for code syntax highlighting -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css"
+  media="(prefers-color-scheme: light)">
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css"
+  media="(prefers-color-scheme: dark)">
+
+<!-- KaTeX for math equations -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
 <style>
   * {
     margin: 0;
@@ -13,8 +24,20 @@
     color-scheme: light dark;
     background-color: #fff;
     color: #161616;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] {
+    background-color: #0d1117;
+    color: #c9d1d9;
+  }
+
+  html[data-theme="sepia"] {
+    background-color: #f4ecd8;
+    color: #5b4636;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) {
       background-color: #0d1117;
       color: #c9d1d9;
     }
@@ -36,11 +59,25 @@
     gap: 8px;
     align-items: center;
     z-index: 100;
+    flex-wrap: wrap;
+  }
 
+  html[data-theme="dark"] .toolbar,
+  html:not([data-theme]) .toolbar {
     @media (prefers-color-scheme: dark) {
       background: #161b22;
       border-bottom-color: #30363d;
     }
+  }
+
+  html[data-theme="dark"] .toolbar {
+    background: #161b22;
+    border-bottom-color: #30363d;
+  }
+
+  html[data-theme="sepia"] .toolbar {
+    background: #e8dcc8;
+    border-bottom-color: #c4b59d;
   }
 
   .toolbar button {
@@ -53,8 +90,22 @@
     font-size: 14px;
     font-weight: 500;
     transition: all 0.2s;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .toolbar button {
+    background: #21262d;
+    border-color: #30363d;
+    color: #c9d1d9;
+  }
+
+  html[data-theme="sepia"] .toolbar button {
+    background: #f4ecd8;
+    border-color: #c4b59d;
+    color: #5b4636;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .toolbar button {
       background: #21262d;
       border-color: #30363d;
       color: #c9d1d9;
@@ -64,8 +115,15 @@
   .toolbar button:hover {
     background: #f3f4f6;
     border-color: #1b1f2326;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .toolbar button:hover {
+    background: #30363d;
+    border-color: #8b949e;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .toolbar button:hover {
       background: #30363d;
       border-color: #8b949e;
     }
@@ -77,7 +135,7 @@
     align-items: center;
   }
 
-  .toolbar-group:last-child {
+  .toolbar-group.actions {
     margin-left: auto;
   }
 
@@ -85,15 +143,23 @@
     background: #0969da;
     color: #fff;
     border-color: #0969da;
-
-    @media (prefers-color-scheme: dark) {
-      background: #1f6feb;
-      border-color: #1f6feb;
-    }
   }
 
-  #btn-share {
-    margin-left: auto;
+  .toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: #d0d7de;
+    margin: 0 4px;
+  }
+
+  html[data-theme="dark"] .toolbar-divider {
+    background: #30363d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .toolbar-divider {
+      background: #30363d;
+    }
   }
 
   .container {
@@ -101,17 +167,151 @@
     height: calc(100vh - 42px);
   }
 
+  /* Left Sidebar */
+  .sidebar {
+    width: 60px;
+    background: #f6f8fa;
+    border-right: 1px solid #d0d7de;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    gap: 6px;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+
+  html[data-theme="dark"] .sidebar {
+    background: #161b22;
+    border-right-color: #30363d;
+  }
+
+  html[data-theme="sepia"] .sidebar {
+    background: #e8dcc8;
+    border-right-color: #c4b59d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .sidebar {
+      background: #161b22;
+      border-right-color: #30363d;
+    }
+  }
+
+  .sidebar button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid #d0d7de;
+    background: #fff;
+    color: #24292f;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  html[data-theme="dark"] .sidebar button {
+    background: #21262d;
+    border-color: #30363d;
+    color: #c9d1d9;
+  }
+
+  html[data-theme="sepia"] .sidebar button {
+    background: #f4ecd8;
+    border-color: #c4b59d;
+    color: #5b4636;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .sidebar button {
+      background: #21262d;
+      border-color: #30363d;
+      color: #c9d1d9;
+    }
+  }
+
+  .sidebar button:hover {
+    background: #f3f4f6;
+    border-color: #1b1f2326;
+  }
+
+  html[data-theme="dark"] .sidebar button:hover {
+    background: #30363d;
+    border-color: #8b949e;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .sidebar button:hover {
+      background: #30363d;
+      border-color: #8b949e;
+    }
+  }
+
+  .sidebar button .icon {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .sidebar button .label {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+  }
+
+  .sidebar-divider {
+    width: 100%;
+    height: 1px;
+    background: #d0d7de;
+    margin: 4px 0;
+  }
+
+  html[data-theme="dark"] .sidebar-divider {
+    background: #30363d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .sidebar-divider {
+      background: #30363d;
+    }
+  }
+
+  .main-content {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  .editor-preview-container {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
   .editor-pane,
   .preview-pane {
     flex: 1;
     overflow-y: auto;
-    padding: 18px max(18px, calc(50vw - 400px));
+    padding: 24px;
   }
 
   .editor-pane {
     border-right: 1px solid #d0d7de;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .editor-pane {
+    border-right-color: #30363d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .editor-pane {
       border-right-color: #30363d;
     }
   }
@@ -134,6 +334,62 @@
     min-height: 100%;
   }
 
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 12px;
+    background: #f6f8fa;
+    border-top: 1px solid #d0d7de;
+    font-size: 12px;
+    color: #57606a;
+  }
+
+  html[data-theme="dark"] .status-bar {
+    background: #161b22;
+    border-top-color: #30363d;
+    color: #8b949e;
+  }
+
+  html[data-theme="sepia"] .status-bar {
+    background: #e8dcc8;
+    border-top-color: #c4b59d;
+    color: #7a6852;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .status-bar {
+      background: #161b22;
+      border-top-color: #30363d;
+      color: #8b949e;
+    }
+  }
+
+  .save-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .save-indicator.saving {
+    color: #bf8700;
+  }
+
+  .save-indicator.saved {
+    color: #1a7f37;
+  }
+
+  html[data-theme="dark"] .save-indicator.saved {
+    color: #3fb950;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .save-indicator.saved {
+      color: #3fb950;
+    }
+  }
+
   /* Markdown Styling */
   .preview h1,
   .preview h2,
@@ -151,8 +407,14 @@
     font-size: 2em;
     border-bottom: 1px solid #d0d7de;
     padding-bottom: 0.3em;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview h1 {
+    border-bottom-color: #30363d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .preview h1 {
       border-bottom-color: #30363d;
     }
   }
@@ -161,16 +423,34 @@
     font-size: 1.5em;
     border-bottom: 1px solid #d0d7de;
     padding-bottom: 0.3em;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview h2 {
+    border-bottom-color: #30363d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .preview h2 {
       border-bottom-color: #30363d;
     }
   }
 
-  .preview h3 { font-size: 1.25em; }
-  .preview h4 { font-size: 1em; }
-  .preview h5 { font-size: 0.875em; }
-  .preview h6 { font-size: 0.85em; color: #57606a; }
+  .preview h3 {
+    font-size: 1.25em;
+  }
+
+  .preview h4 {
+    font-size: 1em;
+  }
+
+  .preview h5 {
+    font-size: 0.875em;
+  }
+
+  .preview h6 {
+    font-size: 0.85em;
+    color: #57606a;
+  }
 
   .preview p {
     margin-bottom: 16px;
@@ -179,8 +459,18 @@
   .preview a {
     color: #0969da;
     text-decoration: none;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview a {
+    color: #58a6ff;
+  }
+
+  html[data-theme="sepia"] .preview a {
+    color: #8b5a2b;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .preview a {
       color: #58a6ff;
     }
   }
@@ -204,8 +494,15 @@
     padding: 0 1em;
     color: #57606a;
     border-left: 0.25em solid #d0d7de;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview blockquote {
+    color: #8b949e;
+    border-left-color: #30363d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .preview blockquote {
       color: #8b949e;
       border-left-color: #30363d;
     }
@@ -228,8 +525,18 @@
     background-color: #f6f8fa;
     border-radius: 6px;
     margin-bottom: 16px;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview pre {
+    background-color: #161b22;
+  }
+
+  html[data-theme="sepia"] .preview pre {
+    background-color: #e8dcc8;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .preview pre {
       background-color: #161b22;
     }
   }
@@ -253,8 +560,17 @@
   .preview table td {
     padding: 6px 13px;
     border: 1px solid #d0d7de;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview table th,
+  html[data-theme="dark"] .preview table td {
+    border-color: #30363d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+
+    html:not([data-theme]) .preview table th,
+    html:not([data-theme]) .preview table td {
       border-color: #30363d;
     }
   }
@@ -262,8 +578,14 @@
   .preview table th {
     font-weight: 600;
     background-color: #f6f8fa;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview table th {
+    background-color: #161b22;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .preview table th {
       background-color: #161b22;
     }
   }
@@ -271,8 +593,15 @@
   .preview table tr {
     background-color: #fff;
     border-top: 1px solid #d0d7de;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview table tr {
+    background-color: #0d1117;
+    border-top-color: #30363d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .preview table tr {
       background-color: #0d1117;
       border-top-color: #30363d;
     }
@@ -280,8 +609,14 @@
 
   .preview table tr:nth-child(2n) {
     background-color: #f6f8fa;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview table tr:nth-child(2n) {
+    background-color: #161b22;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .preview table tr:nth-child(2n) {
       background-color: #161b22;
     }
   }
@@ -297,10 +632,32 @@
     margin: 24px 0;
     background-color: #d0d7de;
     border: 0;
+  }
 
-    @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] .preview hr {
+    background-color: #30363d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .preview hr {
       background-color: #30363d;
     }
+  }
+
+  /* Task list styling */
+  .preview .task-list-item {
+    list-style: none;
+    margin-left: -1.5em;
+  }
+
+  .preview .task-list-item input[type="checkbox"] {
+    margin-right: 0.5em;
+  }
+
+  /* KaTeX math styling */
+  .preview .katex-display {
+    margin: 1em 0;
+    overflow-x: auto;
   }
 
   /* View modes */
@@ -322,68 +679,383 @@
   }
 
   @media (max-width: 768px) {
-    .view-split .container {
+    .view-split .editor-preview-container {
       flex-direction: column;
     }
 
     .view-split .editor-pane {
       border-right: none;
       border-bottom: 1px solid #d0d7de;
+    }
 
-      @media (prefers-color-scheme: dark) {
-        border-bottom-color: #30363d;
-      }
+    html[data-theme="dark"] .view-split .editor-pane {
+      border-bottom-color: #30363d;
+    }
+  }
+
+  /* Fullscreen mode */
+  body.fullscreen .toolbar,
+  body.fullscreen .sidebar,
+  body.fullscreen .status-bar {
+    display: none;
+  }
+
+  body.fullscreen .container {
+    height: 100vh;
+  }
+
+  body.fullscreen .main-content {
+    width: 100%;
+  }
+
+  /* QR Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .modal {
+    background: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 300px;
+  }
+
+  html[data-theme="dark"] .modal {
+    background: #21262d;
+    color: #c9d1d9;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .modal {
+      background: #21262d;
+      color: #c9d1d9;
+    }
+  }
+
+  .modal h3 {
+    margin-bottom: 16px;
+  }
+
+  .modal canvas {
+    margin-bottom: 16px;
+  }
+
+  .modal button {
+    padding: 8px 16px;
+    border: none;
+    background: #0969da;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  /* Print styles */
+  @media print {
+
+    .toolbar,
+    .sidebar,
+    .status-bar,
+    .editor-pane {
+      display: none !important;
+    }
+
+    .container {
+      height: auto;
+    }
+
+    .main-content,
+    .editor-preview-container {
+      display: block;
+    }
+
+    .preview-pane {
+      display: block !important;
+      padding: 0;
+      overflow: visible;
+    }
+
+    .preview {
+      max-width: 100%;
+    }
+
+    .preview pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .preview a {
+      color: inherit;
+      text-decoration: underline;
+    }
+
+    .preview a[href]:after {
+      content: " (" attr(href) ")";
+      font-size: 0.8em;
+      color: #666;
     }
   }
 </style>
 
 <div class="toolbar">
   <div class="toolbar-group">
-    <button id="btn-edit" class="active">Edit</button>
-    <button id="btn-split">Split</button>
-    <button id="btn-preview">Preview</button>
+    <button id="btn-edit" class="active" title="Edit mode">Edit</button>
+    <button id="btn-split" title="Split view">Split</button>
+    <button id="btn-preview" title="Preview mode">Preview</button>
   </div>
+  <div class="toolbar-divider"></div>
   <div class="toolbar-group">
-    <button data-format="bold" aria-label="Apply bold formatting">Bold</button>
-    <button data-format="italic" aria-label="Apply italic formatting">Italic</button>
-    <button data-format="code" aria-label="Apply inline code formatting">Code</button>
-    <button data-format="link" aria-label="Insert link markdown">Link</button>
+    <button id="btn-undo" title="Undo (Ctrl+Z)">↶</button>
+    <button id="btn-redo" title="Redo (Ctrl+Y)">↷</button>
   </div>
+  <div class="toolbar-divider"></div>
   <div class="toolbar-group">
-    <button id="btn-share">📤 Share</button>
+    <button id="btn-theme" title="Toggle theme">☀️</button>
+  </div>
+  <div class="toolbar-group actions">
+    <button id="btn-download" title="Download .md">💾</button>
+    <button id="btn-copy-html" title="Copy as HTML">📋</button>
+    <button id="btn-print" title="Print/PDF">🖨️</button>
+    <button id="btn-qr" title="QR Code">📱</button>
+    <button id="btn-share" title="Share URL">📤</button>
+    <button id="btn-fullscreen" title="Fullscreen (F11)">⛶</button>
   </div>
 </div>
 
 <div class="container">
-  <div class="editor-pane">
-    <textarea class="editor" spellcheck="true" placeholder="Start writing your markdown..."></textarea>
+  <div class="sidebar">
+    <button data-format="bold" aria-label="Bold (Ctrl+B)" title="Bold (Ctrl+B)">
+      <span class="icon">B</span>
+      <span class="label">Bold</span>
+    </button>
+    <button data-format="italic" aria-label="Italic (Ctrl+I)" title="Italic (Ctrl+I)">
+      <span class="icon"><em>I</em></span>
+      <span class="label">Italic</span>
+    </button>
+    <button data-format="code" aria-label="Code (Ctrl+`)" title="Code">
+      <span class="icon">&lt;/&gt;</span>
+      <span class="label">Code</span>
+    </button>
+    <button data-format="link" aria-label="Link (Ctrl+K)" title="Link (Ctrl+K)">
+      <span class="icon">🔗</span>
+      <span class="label">Link</span>
+    </button>
+
+    <div class="sidebar-divider"></div>
+
+    <button data-format="h1" aria-label="Heading 1" title="Heading 1">
+      <span class="icon">H1</span>
+      <span class="label">Head</span>
+    </button>
+    <button data-format="h2" aria-label="Heading 2" title="Heading 2">
+      <span class="icon">H2</span>
+      <span class="label">Head</span>
+    </button>
+    <button data-format="h3" aria-label="Heading 3" title="Heading 3">
+      <span class="icon">H3</span>
+      <span class="label">Head</span>
+    </button>
+
+    <div class="sidebar-divider"></div>
+
+    <button data-format="ul" aria-label="Bullet list" title="Bullet list">
+      <span class="icon">•</span>
+      <span class="label">List</span>
+    </button>
+    <button data-format="ol" aria-label="Numbered list" title="Numbered list">
+      <span class="icon">1.</span>
+      <span class="label">List</span>
+    </button>
+    <button data-format="task" aria-label="Task list" title="Task list">
+      <span class="icon">☐</span>
+      <span class="label">Task</span>
+    </button>
+
+    <div class="sidebar-divider"></div>
+
+    <button data-format="image" aria-label="Image" title="Insert image">
+      <span class="icon">🖼️</span>
+      <span class="label">Image</span>
+    </button>
+    <button data-format="table" aria-label="Table" title="Insert table">
+      <span class="icon">▦</span>
+      <span class="label">Table</span>
+    </button>
+    <button data-format="quote" aria-label="Quote" title="Blockquote">
+      <span class="icon">"</span>
+      <span class="label">Quote</span>
+    </button>
+    <button data-format="hr" aria-label="Horizontal rule" title="Horizontal rule">
+      <span class="icon">―</span>
+      <span class="label">Rule</span>
+    </button>
   </div>
-  <div class="preview-pane">
-    <div class="preview"></div>
+  <div class="main-content">
+    <div class="editor-preview-container">
+      <div class="editor-pane">
+        <textarea class="editor" spellcheck="true" placeholder="Start writing your markdown..."></textarea>
+      </div>
+      <div class="preview-pane">
+        <div class="preview"></div>
+      </div>
+    </div>
+    <div class="status-bar">
+      <div class="save-indicator" id="save-indicator">
+        <span>✓ Saved</span>
+      </div>
+      <div class="word-count" id="word-count">0 words, 0 characters</div>
+    </div>
   </div>
 </div>
 
+<!-- QR Modal -->
+<div class="modal-overlay" id="qr-modal">
+  <div class="modal">
+    <h3>Scan to Share</h3>
+    <canvas id="qr-canvas"></canvas>
+    <button id="close-qr">Close</button>
+  </div>
+</div>
+
+<!-- Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
 <script>
+  // DOM Elements
   const editor = document.querySelector('.editor')
   const preview = document.querySelector('.preview')
+  const html = document.documentElement
   const body = document.body
   const btnEdit = document.getElementById('btn-edit')
   const btnSplit = document.getElementById('btn-split')
   const btnPreview = document.getElementById('btn-preview')
   const btnShare = document.getElementById('btn-share')
+  const btnUndo = document.getElementById('btn-undo')
+  const btnRedo = document.getElementById('btn-redo')
+  const btnTheme = document.getElementById('btn-theme')
+  const btnDownload = document.getElementById('btn-download')
+  const btnCopyHtml = document.getElementById('btn-copy-html')
+  const btnPrint = document.getElementById('btn-print')
+  const btnQr = document.getElementById('btn-qr')
+  const btnFullscreen = document.getElementById('btn-fullscreen')
+  const qrModal = document.getElementById('qr-modal')
+  const qrCanvas = document.getElementById('qr-canvas')
+  const closeQr = document.getElementById('close-qr')
+  const saveIndicator = document.getElementById('save-indicator')
+  const wordCountEl = document.getElementById('word-count')
   const formatButtons = document.querySelectorAll('[data-format]')
+
   const DEFAULT_LINK_URL = 'https://example.com'
   const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)')
+
+  // Undo/Redo history
+  let undoStack = []
+  let redoStack = []
+  let lastContent = ''
+
+  // Mermaid lazy loading
+  let mermaidLoaded = false
   let mermaidInitialized = false
   let mermaidTheme = 'default'
   const MERMAID_SUMMARY_MAX = 120
 
-  // Configure marked
+  // Emoji map for shortcodes
+  const emojiMap = {
+    ':smile:': '😄', ':grin:': '😁', ':joy:': '😂', ':heart:': '❤️',
+    ':thumbsup:': '👍', ':thumbsdown:': '👎', ':clap:': '👏', ':fire:': '🔥',
+    ':star:': '⭐', ':check:': '✅', ':x:': '❌', ':warning:': '⚠️',
+    ':info:': 'ℹ️', ':question:': '❓', ':exclamation:': '❗', ':bulb:': '💡',
+    ':rocket:': '🚀', ':sparkles:': '✨', ':tada:': '🎉', ':thinking:': '🤔',
+    ':eyes:': '👀', ':wave:': '👋', ':coffee:': '☕', ':pizza:': '🍕',
+    ':bug:': '🐛', ':memo:': '📝', ':link:': '🔗', ':lock:': '🔒',
+    ':key:': '🔑', ':hammer:': '🔨', ':wrench:': '🔧', ':gear:': '⚙️',
+    ':package:': '📦', ':bookmark:': '🔖', ':zap:': '⚡', ':boom:': '💥'
+  }
+
+  // Theme handling
+  const themes = ['light', 'dark', 'sepia']
+  let currentThemeIndex = 0
+
+  function getEffectiveTheme() {
+    const savedTheme = localStorage.getItem('theme')
+    if (savedTheme) return savedTheme
+    return prefersDarkMode.matches ? 'dark' : 'light'
+  }
+
+  function setTheme(theme) {
+    if (theme === 'light') {
+      html.removeAttribute('data-theme')
+      if (!prefersDarkMode.matches) {
+        html.removeAttribute('data-theme')
+      } else {
+        html.setAttribute('data-theme', 'light')
+      }
+      btnTheme.textContent = '☀️'
+    } else if (theme === 'dark') {
+      html.setAttribute('data-theme', 'dark')
+      btnTheme.textContent = '🌙'
+    } else if (theme === 'sepia') {
+      html.setAttribute('data-theme', 'sepia')
+      btnTheme.textContent = '📜'
+    }
+    localStorage.setItem('theme', theme)
+    currentThemeIndex = themes.indexOf(theme)
+  }
+
+  function cycleTheme() {
+    currentThemeIndex = (currentThemeIndex + 1) % themes.length
+    setTheme(themes[currentThemeIndex])
+    renderMarkdown()
+  }
+
+  // Initialize theme
+  const savedTheme = localStorage.getItem('theme')
+  if (savedTheme) {
+    setTheme(savedTheme)
+  } else {
+    currentThemeIndex = prefersDarkMode.matches ? 1 : 0
+    btnTheme.textContent = prefersDarkMode.matches ? '🌙' : '☀️'
+  }
+
+  btnTheme.addEventListener('click', cycleTheme)
+
+  // Configure marked with custom renderer
+  const renderer = new marked.Renderer()
+
+  // Custom code block renderer for highlight.js
+  renderer.code = function (code, language) {
+    if (language === 'mermaid') {
+      return `<pre><code class="language-mermaid">${code}</code></pre>`
+    }
+    if (typeof hljs !== 'undefined' && language && hljs.getLanguage(language)) {
+      try {
+        const highlighted = hljs.highlight(code, { language }).value
+        return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`
+      } catch (e) { }
+    }
+    return `<pre><code>${code}</code></pre>`
+  }
+
   marked.setOptions({
     breaks: true,
-    gfm: true
+    gfm: true,
+    renderer: renderer
   })
 
   // View mode handling
@@ -391,7 +1063,7 @@
 
   function setView(view) {
     currentView = view
-    body.className = `view-${view}`
+    body.className = body.className.replace(/view-\w+/g, '') + ` view-${view}`
     btnEdit.classList.toggle('active', view === 'edit')
     btnSplit.classList.toggle('active', view === 'split')
     btnPreview.classList.toggle('active', view === 'preview')
@@ -403,11 +1075,22 @@
   btnPreview.addEventListener('click', () => setView('preview'))
   prefersDarkMode.addEventListener('change', renderMarkdown)
 
+  // Format actions
   const formatActions = {
     bold: () => applyWrap('**', '**', 'bold text'),
     italic: () => applyWrap('_', '_', 'italic text'),
     code: () => applyWrap('`', '`', 'code'),
-    link: () => applyWrap('[', `](${DEFAULT_LINK_URL})`, 'link text')
+    link: () => applyWrap('[', `](${DEFAULT_LINK_URL})`, 'link text'),
+    h1: () => applyLinePrefix('# ', 'Heading 1'),
+    h2: () => applyLinePrefix('## ', 'Heading 2'),
+    h3: () => applyLinePrefix('### ', 'Heading 3'),
+    ul: () => applyLinePrefix('- ', 'List item'),
+    ol: () => applyLinePrefix('1. ', 'List item'),
+    task: () => applyLinePrefix('- [ ] ', 'Task item'),
+    quote: () => applyLinePrefix('> ', 'Quote'),
+    image: () => applyWrap('![', '](https://example.com/image.png)', 'alt text'),
+    table: () => insertTable(),
+    hr: () => insertText('\n---\n')
   }
 
   formatButtons.forEach((button) => {
@@ -417,43 +1100,115 @@
     })
   })
 
+  // Undo/Redo
+  function saveToHistory() {
+    if (editor.value !== lastContent) {
+      undoStack.push(lastContent)
+      if (undoStack.length > 100) undoStack.shift()
+      redoStack = []
+      lastContent = editor.value
+    }
+  }
+
+  function undo() {
+    if (undoStack.length > 0) {
+      redoStack.push(editor.value)
+      editor.value = undoStack.pop()
+      lastContent = editor.value
+      renderMarkdown()
+      save()
+    }
+  }
+
+  function redo() {
+    if (redoStack.length > 0) {
+      undoStack.push(editor.value)
+      editor.value = redoStack.pop()
+      lastContent = editor.value
+      renderMarkdown()
+      save()
+    }
+  }
+
+  btnUndo.addEventListener('click', undo)
+  btnRedo.addEventListener('click', redo)
+
+  // Download .md
+  btnDownload.addEventListener('click', () => {
+    const blob = new Blob([editor.value], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = (document.title || 'document') + '.md'
+    a.click()
+    URL.revokeObjectURL(url)
+  })
+
+  // Copy as HTML
+  btnCopyHtml.addEventListener('click', async () => {
+    const htmlContent = preview.innerHTML
+    try {
+      await navigator.clipboard.writeText(htmlContent)
+      showButtonFeedback(btnCopyHtml, '✓')
+    } catch (e) {
+      alert('Failed to copy HTML')
+    }
+  })
+
+  // Print/PDF
+  btnPrint.addEventListener('click', () => {
+    // Temporarily switch to preview mode for printing
+    const originalView = currentView
+    setView('preview')
+    setTimeout(() => {
+      window.print()
+      setView(originalView)
+    }, 100)
+  })
+
+  // QR Code
+  btnQr.addEventListener('click', () => {
+    const url = window.location.href
+    QRCode.toCanvas(qrCanvas, url, { width: 200 }, (err) => {
+      if (err) console.error(err)
+    })
+    qrModal.classList.add('active')
+  })
+
+  closeQr.addEventListener('click', () => {
+    qrModal.classList.remove('active')
+  })
+
+  qrModal.addEventListener('click', (e) => {
+    if (e.target === qrModal) {
+      qrModal.classList.remove('active')
+    }
+  })
+
+  // Fullscreen
+  btnFullscreen.addEventListener('click', () => {
+    body.classList.toggle('fullscreen')
+    btnFullscreen.textContent = body.classList.contains('fullscreen') ? '⛶' : '⛶'
+  })
+
   // Share button handler
   btnShare.addEventListener('click', async () => {
     const url = window.location.href
     const title = document.title
 
-    // Try Web Share API first (mobile devices)
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: title,
-          text: 'Check out this markdown document',
-          url: url
-        })
+        await navigator.share({ title, text: 'Check out this markdown document', url })
         return
       } catch (err) {
-        // User cancelled or share failed, fall through to clipboard
-        if (err.name !== 'AbortError') {
-          console.log('Share failed:', err)
-        }
+        if (err.name !== 'AbortError') console.log('Share failed:', err)
       }
     }
 
-    // Fallback to clipboard
     try {
       await navigator.clipboard.writeText(url)
-      // Visual feedback
-      const originalText = btnShare.textContent
-      btnShare.textContent = '✓ Copied!'
-      btnShare.style.background = '#2da44e'
-      btnShare.style.borderColor = '#2da44e'
-      setTimeout(() => {
-        btnShare.textContent = originalText
-        btnShare.style.background = ''
-        btnShare.style.borderColor = ''
-      }, 2000)
+      showButtonFeedback(btnShare, '✓')
     } catch (err) {
-      // Fallback for older browsers
       const textarea = document.createElement('textarea')
       textarea.value = url
       textarea.style.position = 'fixed'
@@ -462,11 +1217,7 @@
       textarea.select()
       try {
         document.execCommand('copy')
-        const originalText = btnShare.textContent
-        btnShare.textContent = '✓ Copied!'
-        setTimeout(() => {
-          btnShare.textContent = originalText
-        }, 2000)
+        showButtonFeedback(btnShare, '✓')
       } catch (e) {
         alert('Failed to copy. Please copy manually: ' + url)
       }
@@ -474,24 +1225,85 @@
     }
   })
 
+  function showButtonFeedback(btn, text) {
+    const original = btn.textContent
+    btn.textContent = text
+    btn.style.background = '#2da44e'
+    btn.style.borderColor = '#2da44e'
+    setTimeout(() => {
+      btn.textContent = original
+      btn.style.background = ''
+      btn.style.borderColor = ''
+    }, 1500)
+  }
+
   // Restore view mode
   const savedView = localStorage.getItem('viewMode')
   if (savedView) setView(savedView)
 
-  // Markdown rendering
+  // Word count
+  function updateWordCount() {
+    const text = editor.value.trim()
+    const words = text ? text.split(/\s+/).length : 0
+    const chars = editor.value.length
+    wordCountEl.textContent = `${words} word${words !== 1 ? 's' : ''}, ${chars} character${chars !== 1 ? 's' : ''}`
+  }
+
+  // Save indicator
+  function showSaving() {
+    saveIndicator.className = 'save-indicator saving'
+    saveIndicator.innerHTML = '<span>⏳ Saving...</span>'
+  }
+
+  function showSaved() {
+    saveIndicator.className = 'save-indicator saved'
+    saveIndicator.innerHTML = '<span>✓ Saved</span>'
+  }
+
+  // Markdown rendering with emoji support
+  function processEmojis(text) {
+    return text.replace(/:[a-z_]+:/g, match => emojiMap[match] || match)
+  }
+
+  // KaTeX math rendering
+  function renderMath(html) {
+    // Block math: $$...$$
+    html = html.replace(/\$\$([^$]+)\$\$/g, (match, math) => {
+      try {
+        return katex.renderToString(math.trim(), { displayMode: true, throwOnError: false })
+      } catch (e) {
+        return match
+      }
+    })
+    // Inline math: $...$
+    html = html.replace(/\$([^$\n]+)\$/g, (match, math) => {
+      try {
+        return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false })
+      } catch (e) {
+        return match
+      }
+    })
+    return html
+  }
+
   function renderMarkdown() {
-    const markdown = editor.value
-    preview.innerHTML = marked.parse(markdown)
+    let markdown = editor.value
+    markdown = processEmojis(markdown)
+    let html = marked.parse(markdown)
+    html = renderMath(html)
+    preview.innerHTML = html
     renderMermaid()
     updateTitle()
+    updateWordCount()
   }
 
   editor.addEventListener('input', debounce(500, () => {
-    save()
+    saveToHistory()
+    showSaving()
+    save().then(showSaved)
     renderMarkdown()
   }))
 
-  // Immediate preview update for better UX
   editor.addEventListener('input', debounce(100, renderMarkdown))
 
   addEventListener('DOMContentLoaded', load)
@@ -509,13 +1321,14 @@
     } catch (e) {
       editor.value = ''
     }
+    lastContent = editor.value
     renderMarkdown()
   }
 
   async function save() {
     const hash = await get()
     if (location.hash !== hash) history.replaceState({}, '', hash)
-    try { localStorage.setItem('hash', hash) } catch (e) {}
+    try { localStorage.setItem('hash', hash) } catch (e) { }
   }
 
   async function set(hash) {
@@ -541,11 +1354,9 @@
     const buffer = await new Response(stream.readable).arrayBuffer()
     const uint8Array = new Uint8Array(buffer)
 
-    // Use native toBase64 if available, otherwise fallback
     if (typeof uint8Array.toBase64 === 'function') {
       return uint8Array.toBase64().replace(/\+/g, "-").replace(/\//g, "_")
     } else {
-      // Fallback for browsers without toBase64 support
       const binary = Array.from(uint8Array, byte => String.fromCharCode(byte)).join('')
       return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")
     }
@@ -553,18 +1364,12 @@
 
   async function decompress(b64) {
     if (!b64) return ''
-
     try {
-      // Restore standard base64 format
       const standardB64 = b64.replace(/-/g, "+").replace(/_/g, "/")
-
       let byteArray
-      // Use native fromBase64 if available, otherwise fallback
       if (typeof Uint8Array.fromBase64 === 'function') {
         byteArray = Uint8Array.fromBase64(standardB64)
       } else {
-        // Fallback for browsers without fromBase64 support
-        // Add padding if needed
         const padding = (4 - (standardB64.length % 4)) % 4
         const paddedB64 = standardB64 + '='.repeat(padding)
         const binary = atob(paddedB64)
@@ -573,7 +1378,6 @@
           byteArray[i] = binary.charCodeAt(i)
         }
       }
-
       const stream = new DecompressionStream('deflate-raw')
       const writer = stream.writable.getWriter()
       writer.write(byteArray)
@@ -596,7 +1400,6 @@
 
   function applyWrap(prefix, suffix = prefix, placeholder = '') {
     if (!editor) return
-
     const start = editor.selectionStart
     const end = editor.selectionEnd
     const value = editor.value
@@ -615,8 +1418,49 @@
     save()
   }
 
-  // Handle tab key in editor
+  function applyLinePrefix(prefix, placeholder = '') {
+    if (!editor) return
+    const start = editor.selectionStart
+    const value = editor.value
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1
+    const before = value.slice(0, lineStart)
+    const after = value.slice(lineStart)
+    const hasContent = after.split('\n')[0].trim().length > 0
+    const insertion = hasContent ? prefix : prefix + placeholder
+    const newValue = before + insertion + after
+    editor.value = newValue
+    editor.focus()
+    const cursorPos = lineStart + insertion.length
+    editor.setSelectionRange(cursorPos, cursorPos)
+    renderMarkdown()
+    save()
+  }
+
+  function insertText(text) {
+    const start = editor.selectionStart
+    const before = editor.value.slice(0, start)
+    const after = editor.value.slice(editor.selectionEnd)
+    editor.value = before + text + after
+    editor.focus()
+    const cursorPos = start + text.length
+    editor.setSelectionRange(cursorPos, cursorPos)
+    renderMarkdown()
+    save()
+  }
+
+  function insertTable() {
+    const table = `
+| Header 1 | Header 2 | Header 3 |
+|----------|----------|----------|
+| Cell 1   | Cell 2   | Cell 3   |
+| Cell 4   | Cell 5   | Cell 6   |
+`
+    insertText(table)
+  }
+
+  // Keyboard shortcuts
   editor.addEventListener('keydown', (e) => {
+    // Tab
     if (e.key === 'Tab') {
       e.preventDefault()
       const start = editor.selectionStart
@@ -624,14 +1468,79 @@
       editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end)
       editor.selectionStart = editor.selectionEnd = start + 2
     }
+
+    // Ctrl/Cmd + key shortcuts
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case 'b':
+          e.preventDefault()
+          formatActions.bold()
+          break
+        case 'i':
+          e.preventDefault()
+          formatActions.italic()
+          break
+        case 'k':
+          e.preventDefault()
+          formatActions.link()
+          break
+        case 's':
+          e.preventDefault()
+          save()
+          showSaved()
+          break
+        case 'z':
+          if (e.shiftKey) {
+            e.preventDefault()
+            redo()
+          } else {
+            e.preventDefault()
+            undo()
+          }
+          break
+        case 'y':
+          e.preventDefault()
+          redo()
+          break
+      }
+    }
+
+    // F11 for fullscreen
+    if (e.key === 'F11') {
+      e.preventDefault()
+      body.classList.toggle('fullscreen')
+    }
+
+    // Escape to exit fullscreen
+    if (e.key === 'Escape' && body.classList.contains('fullscreen')) {
+      body.classList.remove('fullscreen')
+    }
   })
 
+  // Lazy load mermaid
+  async function loadMermaid() {
+    if (mermaidLoaded) return
+    mermaidLoaded = true
+    const script = document.createElement('script')
+    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js'
+    script.onload = () => {
+      renderMermaid()
+    }
+    document.head.appendChild(script)
+  }
+
   function renderMermaid() {
-    if (typeof mermaid === 'undefined') return
     const codeBlocks = preview.querySelectorAll('pre code.language-mermaid')
     if (!codeBlocks.length) return
 
-    const nextTheme = prefersDarkMode.matches ? 'dark' : 'default'
+    if (typeof mermaid === 'undefined') {
+      loadMermaid()
+      return
+    }
+
+    const effectiveTheme = getEffectiveTheme()
+    const nextTheme = effectiveTheme === 'dark' ? 'dark' : 'default'
+
     if (!mermaidInitialized || mermaidTheme !== nextTheme) {
       mermaid.initialize({
         startOnLoad: false,
