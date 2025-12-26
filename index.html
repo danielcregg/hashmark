@@ -71,6 +71,16 @@
     }
   }
 
+  .toolbar-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .toolbar-group:last-child {
+    margin-left: auto;
+  }
+
   .toolbar button.active {
     background: #0969da;
     color: #fff;
@@ -328,10 +338,20 @@
 </style>
 
 <div class="toolbar">
-  <button id="btn-edit" class="active">Edit</button>
-  <button id="btn-split">Split</button>
-  <button id="btn-preview">Preview</button>
-  <button id="btn-share">📤 Share</button>
+  <div class="toolbar-group">
+    <button id="btn-edit" class="active">Edit</button>
+    <button id="btn-split">Split</button>
+    <button id="btn-preview">Preview</button>
+  </div>
+  <div class="toolbar-group">
+    <button data-format="bold" aria-label="Apply bold formatting">Bold</button>
+    <button data-format="italic" aria-label="Apply italic formatting">Italic</button>
+    <button data-format="code" aria-label="Apply inline code formatting">Code</button>
+    <button data-format="link" aria-label="Insert link markdown">Link</button>
+  </div>
+  <div class="toolbar-group">
+    <button id="btn-share">📤 Share</button>
+  </div>
 </div>
 
 <div class="container">
@@ -353,6 +373,8 @@
   const btnSplit = document.getElementById('btn-split')
   const btnPreview = document.getElementById('btn-preview')
   const btnShare = document.getElementById('btn-share')
+  const formatButtons = document.querySelectorAll('[data-format]')
+  const DEFAULT_LINK_URL = 'https://example.com'
   const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)')
   let mermaidInitialized = false
   let mermaidTheme = 'default'
@@ -380,6 +402,20 @@
   btnSplit.addEventListener('click', () => setView('split'))
   btnPreview.addEventListener('click', () => setView('preview'))
   prefersDarkMode.addEventListener('change', renderMarkdown)
+
+  const formatActions = {
+    bold: () => applyWrap('**', '**', 'bold text'),
+    italic: () => applyWrap('_', '_', 'italic text'),
+    code: () => applyWrap('`', '`', 'code'),
+    link: () => applyWrap('[', `](${DEFAULT_LINK_URL})`, 'link text')
+  }
+
+  formatButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const action = formatActions[button.dataset.format]
+      if (action) action()
+    })
+  })
 
   // Share button handler
   btnShare.addEventListener('click', async () => {
@@ -556,6 +592,27 @@
       clearTimeout(timer)
       timer = setTimeout(() => fn(...args), ms)
     }
+  }
+
+  function applyWrap(prefix, suffix = prefix, placeholder = '') {
+    if (!editor) return
+
+    const start = editor.selectionStart
+    const end = editor.selectionEnd
+    const value = editor.value
+    const hasSelection = start !== end
+    const selectedText = hasSelection ? value.slice(start, end) : placeholder
+    const before = value.slice(0, start)
+    const after = value.slice(end)
+    const insertion = `${prefix}${selectedText}${suffix}`
+    const newValue = before + insertion + after
+    const cursorStart = before.length + prefix.length
+    const cursorEnd = cursorStart + selectedText.length
+    editor.value = newValue
+    editor.focus()
+    editor.setSelectionRange(cursorStart, cursorEnd)
+    renderMarkdown()
+    save()
   }
 
   // Handle tab key in editor
