@@ -1,36 +1,74 @@
-# [textarea.my](https://textarea.my)
+# Markdown Editor
 
-A _minimalist_ text editor that lives entirely in your browser and stores everything in the URL hash.
+A _minimalist_ markdown editor that lives entirely in your browser with real-time rendering and URL-based sharing.
 
 ## Features
 
-- 📝 **It's a textarea!** Actually not.
-- 🗜️ **Compression magic** - Your text gets compressed with deflate because we're fancy like that
-- 🔗 **URL storage** - Share your notes by copying a 500-character URL. Your friends will love it!
-- 🌓 **Dark mode** - Respects your poor eyes and your color scheme preference
-- 💾 **Auto-save** - Debounced to 500ms because we're not savages
-- 📱 **Mobile friendly** - Type your manifesto on the go
-- 🎯 **No backend** - Zero servers were harmed in the making of this app
+- 📝 **Full Markdown Support** - Write with complete GitHub-Flavored Markdown (GFM) syntax
+- 👁️ **Live Preview** - See your markdown rendered in real-time as you type
+- 🔄 **Three View Modes**:
+  - **Edit** - Focus on writing
+  - **Preview** - See the fully rendered document
+  - **Split** - Edit and preview side-by-side
+- 🗜️ **Compression magic** - Your markdown gets compressed with deflate for efficient URL storage
+- 🔗 **URL-based sharing** - Share your rendered documents by copying the URL
+- 🌓 **Dark mode** - Respects your system's color scheme preference
+- 💾 **Auto-save** - Changes are saved automatically (500ms debounce)
+- 📱 **Mobile friendly** - Responsive design works on all devices
+- 🎯 **No backend** - Zero servers, everything runs in your browser
+- 💾 **Dual persistence** - Stored in both localStorage and URL hash
 
 ## How to use
 
-1. Open [textarea.my](https://textarea.my)
-2. Type stuff
-3. Marvel at the URL getting longer
-4. Try to share it
-5. ...
-6. Profit
+1. Open the editor
+2. Write your markdown in the editor pane
+3. Click **Split** to see live preview alongside your text
+4. Click **Preview** to see only the rendered output
+5. Share your document by copying the URL
+6. Recipients see the exact same rendered content when they open the link
+
+## Markdown Support
+
+Full support for:
+
+- **Headings** (# H1 through ###### H6)
+- **Emphasis** (*italic*, **bold**, ***bold italic***)
+- **Lists** (ordered and unordered)
+- **Links** and **Images**
+- **Code blocks** with syntax preservation
+- **Inline code** formatting
+- **Blockquotes**
+- **Tables**
+- **Horizontal rules**
+- **Line breaks** (GFM-style)
 
 ## Pro tips
 
 - Start your document with `# Title` to set a custom page title
-- Your data lives in localStorage AND the URL. Double the fun!
-- Feeling fancy? Add a `style` attribute to the `<article>` tag via DevTools. It'll be saved in the URL too!
+- Use **Tab** key in the editor to insert spaces (instead of losing focus)
+- Your preferred view mode (Edit/Split/Preview) is remembered
+- Data lives in both localStorage AND the URL for maximum reliability
+- Share documents by simply copying and pasting the URL
 
 ## Examples
 
-- [Crime and Punishment (by Fyodor Dostoevsky)](https://medv.io/goto/crime-and-punishment-by-fyodor-dostoevsky.html)
-- [An Ode to Comic Sans (by ChatGPT)](https://textarea.my/#TVM9j9w2EE3NX_FwaRJAtwe4SHGu7g5I4MII4HNgpByRI4lZiqPMjFbeVPsj0hiI_9z-koCyDV9FznA-33v8EQ8VvyeGC55kzhHPVC2E73eQaj6xYcs-yeogO-Y6duEBo-aKXOHnRUalZcoRg-jchedJuFBkw1o9c-pghblVUSmFE9alC09KNuU6widGT_XvlR0ywFjzAKoJVXQ-hPAoWlFlf5xJ-8KYqBSDKApt6DXzYF14XB1JJBW2DrYwxwn92ve7TZioptuktFUshakLb7xF0dH2JSbGSXLk1qUZsZCZisxYxJz1Plwv_z0yjrmm7nr5jGbSkWFU-JvjVQMAgzIfrpfPIbyf-Ds8rAaLMgwdKP21mrc-WXFkrTukT2X1OOE3UpqlJpR8ZCxMWgzkSLTVQ_iT_QVV2OjU1lsr9WQTpy48Tcw6rKWcsanUsYP52veitZwh9RDa4ptmZ0Of1adEZ0TSZDvoRcxvk4wYypnVWr1V44TKmxV2bz5YHqvBaeGEqCJHTk1CSUTt0OonYds526ZsCysWZfM8ciNtkY31evl3Z6CJyroG3jsu9PGAD3y9fDoxjLliE7WvWL6VeGxSmnluBztrpbZlX2jmFH4VRdQ8syE7Kp9YQUUqI8o8Z_cGzhtHz6S2U7xxHqddVtM6U4WTOYcP2ScQbM6F4RM5ItXr5VPLBKfsnA4hPNQE81xKa7awWjb_KrNlOYNizImrd-GPGkVKY6gXn1jb7GtVHnJtA73jOdf07RtsoiV1TY8qa03ceqgc2brwvk3SEKVSWlwyVP4C-8akIHjmww8BAHqKx3GvcI9Vy093dzOn0yHLHZmx2505qR3GPPz8ek8YpPrtQHMu53vcvJDX2-eb7qXjpkNc1fKJXyRa_ofv8eqX5eMXZ5Qiet-od34d_gc=)
+Create beautiful documents like:
+
+- Technical documentation
+- Blog posts and articles
+- Meeting notes and agendas
+- Project README files
+- Personal journals
+- Code tutorials
+- Quick notes and lists
+
+## Technical Details
+
+- **Markdown Engine**: Marked.js (v11.1.1)
+- **Compression**: Deflate-raw with base64 URL-safe encoding
+- **Styling**: GitHub-inspired markdown rendering
+- **Storage**: CompressionStream API + localStorage fallback
+- **Size**: Single HTML file (~465 lines)
 
 ---
 

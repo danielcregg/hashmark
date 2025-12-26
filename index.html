@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Textarea</title>
+<title>Markdown Editor</title>
 <style>
   * {
     margin: 0;
@@ -15,69 +15,411 @@
     color: #161616;
 
     @media (prefers-color-scheme: dark) {
-      background-color: #000;
-      color: #fff;
+      background-color: #0d1117;
+      color: #c9d1d9;
     }
   }
 
-  article {
-    outline: none;
-    padding: 18px max(18px, calc(50vw - 400px));
-    width: 100%;
-    min-height: 100vh;
-    font: 18px / 1.5 system-ui;
-    tab-size: 4;
+  body {
+    font: 16px / 1.6 system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  .toolbar {
+    position: sticky;
+    top: 0;
+    background: #f6f8fa;
+    border-bottom: 1px solid #d0d7de;
+    padding: 8px 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    z-index: 100;
+
+    @media (prefers-color-scheme: dark) {
+      background: #161b22;
+      border-bottom-color: #30363d;
+    }
+  }
+
+  .toolbar button {
+    padding: 6px 12px;
+    border: 1px solid #d0d7de;
+    background: #fff;
+    color: #24292f;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    @media (prefers-color-scheme: dark) {
+      background: #21262d;
+      border-color: #30363d;
+      color: #c9d1d9;
+    }
+  }
+
+  .toolbar button:hover {
+    background: #f3f4f6;
+    border-color: #1b1f2326;
+
+    @media (prefers-color-scheme: dark) {
+      background: #30363d;
+      border-color: #8b949e;
+    }
+  }
+
+  .toolbar button.active {
+    background: #0969da;
+    color: #fff;
+    border-color: #0969da;
+
+    @media (prefers-color-scheme: dark) {
+      background: #1f6feb;
+      border-color: #1f6feb;
+    }
+  }
+
+  .container {
+    display: flex;
+    height: calc(100vh - 42px);
+  }
+
+  .editor-pane,
+  .preview-pane {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px max(18px, calc(50vw - 400px));
+  }
+
+  .editor-pane {
+    border-right: 1px solid #d0d7de;
+
+    @media (prefers-color-scheme: dark) {
+      border-right-color: #30363d;
+    }
+  }
+
+  .editor {
+    outline: none;
+    width: 100%;
+    min-height: 100%;
+    font: 16px / 1.6 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    tab-size: 2;
     white-space: pre-wrap;
-    text-wrap-style: pretty;
     overflow-wrap: break-word;
+    background: transparent;
+    color: inherit;
+    border: none;
+    resize: none;
+  }
+
+  .preview {
+    min-height: 100%;
+  }
+
+  /* Markdown Styling */
+  .preview h1,
+  .preview h2,
+  .preview h3,
+  .preview h4,
+  .preview h5,
+  .preview h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .preview h1 {
+    font-size: 2em;
+    border-bottom: 1px solid #d0d7de;
+    padding-bottom: 0.3em;
+
+    @media (prefers-color-scheme: dark) {
+      border-bottom-color: #30363d;
+    }
+  }
+
+  .preview h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid #d0d7de;
+    padding-bottom: 0.3em;
+
+    @media (prefers-color-scheme: dark) {
+      border-bottom-color: #30363d;
+    }
+  }
+
+  .preview h3 { font-size: 1.25em; }
+  .preview h4 { font-size: 1em; }
+  .preview h5 { font-size: 0.875em; }
+  .preview h6 { font-size: 0.85em; color: #57606a; }
+
+  .preview p {
+    margin-bottom: 16px;
+  }
+
+  .preview a {
+    color: #0969da;
+    text-decoration: none;
+
+    @media (prefers-color-scheme: dark) {
+      color: #58a6ff;
+    }
+  }
+
+  .preview a:hover {
+    text-decoration: underline;
+  }
+
+  .preview ul,
+  .preview ol {
+    margin-bottom: 16px;
+    padding-left: 2em;
+  }
+
+  .preview li {
+    margin-bottom: 4px;
+  }
+
+  .preview blockquote {
+    margin: 16px 0;
+    padding: 0 1em;
+    color: #57606a;
+    border-left: 0.25em solid #d0d7de;
+
+    @media (prefers-color-scheme: dark) {
+      color: #8b949e;
+      border-left-color: #30363d;
+    }
+  }
+
+  .preview code {
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(175, 184, 193, 0.2);
+    border-radius: 6px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  }
+
+  .preview pre {
+    padding: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    margin-bottom: 16px;
+
+    @media (prefers-color-scheme: dark) {
+      background-color: #161b22;
+    }
+  }
+
+  .preview pre code {
+    background-color: transparent;
+    padding: 0;
+  }
+
+  .preview table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .preview table th,
+  .preview table td {
+    padding: 6px 13px;
+    border: 1px solid #d0d7de;
+
+    @media (prefers-color-scheme: dark) {
+      border-color: #30363d;
+    }
+  }
+
+  .preview table th {
+    font-weight: 600;
+    background-color: #f6f8fa;
+
+    @media (prefers-color-scheme: dark) {
+      background-color: #161b22;
+    }
+  }
+
+  .preview table tr {
+    background-color: #fff;
+    border-top: 1px solid #d0d7de;
+
+    @media (prefers-color-scheme: dark) {
+      background-color: #0d1117;
+      border-top-color: #30363d;
+    }
+  }
+
+  .preview table tr:nth-child(2n) {
+    background-color: #f6f8fa;
+
+    @media (prefers-color-scheme: dark) {
+      background-color: #161b22;
+    }
+  }
+
+  .preview img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .preview hr {
+    height: 0.25em;
+    padding: 0;
+    margin: 24px 0;
+    background-color: #d0d7de;
+    border: 0;
+
+    @media (prefers-color-scheme: dark) {
+      background-color: #30363d;
+    }
+  }
+
+  /* View modes */
+  .view-edit .preview-pane {
+    display: none;
+  }
+
+  .view-edit .editor-pane {
+    border-right: none;
+  }
+
+  .view-preview .editor-pane {
+    display: none;
+  }
+
+  .view-split .editor-pane,
+  .view-split .preview-pane {
+    flex: 1;
+  }
+
+  @media (max-width: 768px) {
+    .view-split .container {
+      flex-direction: column;
+    }
+
+    .view-split .editor-pane {
+      border-right: none;
+      border-bottom: 1px solid #d0d7de;
+
+      @media (prefers-color-scheme: dark) {
+        border-bottom-color: #30363d;
+      }
+    }
   }
 </style>
-<article contenteditable="plaintext-only" spellcheck></article>
+
+<div class="toolbar">
+  <button id="btn-edit" class="active">Edit</button>
+  <button id="btn-split">Split</button>
+  <button id="btn-preview">Preview</button>
+</div>
+
+<div class="container">
+  <div class="editor-pane">
+    <textarea class="editor" spellcheck="true" placeholder="Start writing your markdown..."></textarea>
+  </div>
+  <div class="preview-pane">
+    <div class="preview"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 <script>
-  const article = document.querySelector('article')
-  article.addEventListener('input', debounce(500, save))
+  const editor = document.querySelector('.editor')
+  const preview = document.querySelector('.preview')
+  const body = document.body
+  const btnEdit = document.getElementById('btn-edit')
+  const btnSplit = document.getElementById('btn-split')
+  const btnPreview = document.getElementById('btn-preview')
+
+  // Configure marked
+  marked.setOptions({
+    breaks: true,
+    gfm: true
+  })
+
+  // View mode handling
+  let currentView = 'edit'
+
+  function setView(view) {
+    currentView = view
+    body.className = `view-${view}`
+    btnEdit.classList.toggle('active', view === 'edit')
+    btnSplit.classList.toggle('active', view === 'split')
+    btnPreview.classList.toggle('active', view === 'preview')
+    localStorage.setItem('viewMode', view)
+  }
+
+  btnEdit.addEventListener('click', () => setView('edit'))
+  btnSplit.addEventListener('click', () => setView('split'))
+  btnPreview.addEventListener('click', () => setView('preview'))
+
+  // Restore view mode
+  const savedView = localStorage.getItem('viewMode')
+  if (savedView) setView(savedView)
+
+  // Markdown rendering
+  function renderMarkdown() {
+    const markdown = editor.value
+    preview.innerHTML = marked.parse(markdown)
+    updateTitle()
+  }
+
+  editor.addEventListener('input', debounce(500, () => {
+    save()
+    renderMarkdown()
+  }))
+
+  // Immediate preview update for better UX
+  editor.addEventListener('input', debounce(100, renderMarkdown))
+
   addEventListener('DOMContentLoaded', load)
   addEventListener('hashchange', load)
 
   async function load() {
     try {
-      if (location.hash !== '') await set(location.hash)
-      else {
+      if (location.hash !== '') {
+        await set(location.hash)
+      } else {
         await set(localStorage.getItem('hash') ?? '')
-        if (article.textContent) history.replaceState({}, '', await get())
-        article.focus()
+        if (editor.value) history.replaceState({}, '', await get())
+        editor.focus()
       }
     } catch (e) {
-      article.textContent = ''
-      article.removeAttribute('style')
+      editor.value = ''
     }
-    updateTitle()
+    renderMarkdown()
   }
 
   async function save() {
     const hash = await get()
     if (location.hash !== hash) history.replaceState({}, '', hash)
     try { localStorage.setItem('hash', hash) } catch (e) {}
-    updateTitle()
   }
 
   async function set(hash) {
-    const [content, style] = (await decompress(hash.slice(1))).split('\x00')
-    article.textContent = content
-    if (style) article.setAttribute('style', style)
+    const content = await decompress(hash.slice(1))
+    editor.value = content
   }
 
   async function get() {
-    const style = article.getAttribute('style')
-    const content = article.textContent + (style !== null ? '\x00' + style : '')
-    return '#' + await compress(content)
+    return '#' + await compress(editor.value)
   }
 
   function updateTitle() {
-    const match = article.textContent.match(/^\n*#(.+)\n/)
-    document.title = match?.[1] ?? 'Textarea'
+    const match = editor.value.match(/^\n*#\s*(.+)/)
+    document.title = match?.[1] ?? 'Markdown Editor'
   }
 
   async function compress(string) {
@@ -91,6 +433,7 @@
   }
 
   async function decompress(b64) {
+    if (!b64) return ''
     const byteArray = Uint8Array.fromBase64(b64.replace(/-/g, "+").replace(/_/g, "/"))
     const stream = new DecompressionStream('deflate-raw')
     const writer = stream.writable.getWriter()
@@ -107,4 +450,15 @@
       timer = setTimeout(() => fn(...args), ms)
     }
   }
+
+  // Handle tab key in editor
+  editor.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      const start = editor.selectionStart
+      const end = editor.selectionEnd
+      editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end)
+      editor.selectionStart = editor.selectionEnd = start + 2
+    }
+  })
 </script>
