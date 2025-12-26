@@ -934,7 +934,7 @@
 <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.js"></script>
 
 <script>
   // DOM Elements
@@ -1166,12 +1166,33 @@
   })
 
   // QR Code
-  btnQr.addEventListener('click', () => {
+  btnQr.addEventListener('click', async () => {
     const url = window.location.href
-    QRCode.toCanvas(qrCanvas, url, { width: 200 }, (err) => {
-      if (err) console.error(err)
-    })
-    qrModal.classList.add('active')
+
+    // Check if QRCode library is available
+    if (typeof QRCode === 'undefined') {
+      alert('QR Code library failed to load. Please check your internet connection.')
+      return
+    }
+
+    try {
+      // Clear previous QR code
+      const ctx = qrCanvas.getContext('2d')
+      ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height)
+
+      await QRCode.toCanvas(qrCanvas, url, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        }
+      })
+      qrModal.classList.add('active')
+    } catch (err) {
+      console.error('QR Code generation error:', err)
+      alert('Failed to generate QR code: ' + err.message)
+    }
   })
 
   closeQr.addEventListener('click', () => {
