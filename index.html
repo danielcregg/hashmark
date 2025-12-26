@@ -1518,6 +1518,39 @@
   editor.addEventListener('scroll', syncLineNumbersScroll)
   editor.addEventListener('input', updateLineNumbers)
 
+  // Scroll sync between editor and preview in split view
+  const editorPane = document.querySelector('.editor-pane')
+  const previewPane = document.querySelector('.preview-pane')
+  let scrollSyncLock = false
+
+  function syncScroll(source, target) {
+    if (scrollSyncLock) return
+    if (body.className !== 'view-split') return
+
+    scrollSyncLock = true
+
+    // Calculate scroll percentage
+    const sourceScrollHeight = source.scrollHeight - source.clientHeight
+    const scrollPercent = sourceScrollHeight > 0 ? source.scrollTop / sourceScrollHeight : 0
+
+    // Apply to target
+    const targetScrollHeight = target.scrollHeight - target.clientHeight
+    target.scrollTop = scrollPercent * targetScrollHeight
+
+    // Release lock after a short delay
+    requestAnimationFrame(() => {
+      scrollSyncLock = false
+    })
+  }
+
+  editorPane.addEventListener('scroll', () => {
+    syncScroll(editorPane, previewPane)
+  })
+
+  previewPane.addEventListener('scroll', () => {
+    syncScroll(previewPane, editorPane)
+  })
+
   // Configure marked with custom renderer
   const renderer = new marked.Renderer()
 
