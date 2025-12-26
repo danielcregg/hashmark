@@ -330,6 +330,52 @@
     resize: none;
   }
 
+  /* Editor wrapper for line numbers */
+  .editor-wrapper {
+    display: flex;
+    min-height: 100%;
+  }
+
+  .line-numbers {
+    display: none;
+    flex-shrink: 0;
+    width: 40px;
+    padding: 0 8px 0 0;
+    margin-right: 12px;
+    border-right: 1px solid #d0d7de;
+    text-align: right;
+    font: 16px / 1.6 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    color: #8b949e;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  html[data-theme="dark"] .line-numbers {
+    border-right-color: #30363d;
+    color: #6e7681;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .line-numbers {
+      border-right-color: #30363d;
+      color: #6e7681;
+    }
+  }
+
+  .line-numbers.visible {
+    display: block;
+  }
+
+  .line-numbers .line-num {
+    display: block;
+    height: 1.6em;
+  }
+
+  /* Adjust editor when line numbers are visible */
+  .editor-wrapper.has-line-numbers .editor {
+    padding-left: 0;
+  }
+
   .preview {
     min-height: 100%;
   }
@@ -954,6 +1000,7 @@
   <div class="toolbar-divider"></div>
   <div class="toolbar-group">
     <button id="btn-theme" title="Toggle theme">☀️</button>
+    <button id="btn-linenums" title="Toggle line numbers">123</button>
   </div>
   <div class="toolbar-group actions">
     <button id="btn-new" title="New document (opens in new tab)">📄 New</button>
@@ -1048,7 +1095,10 @@
   <div class="main-content">
     <div class="editor-preview-container">
       <div class="editor-pane">
-        <textarea class="editor" spellcheck="true" placeholder="Start writing your markdown..."></textarea>
+        <div class="editor-wrapper">
+          <div class="line-numbers" id="line-numbers"></div>
+          <textarea class="editor" spellcheck="true" placeholder="Start writing your markdown..."></textarea>
+        </div>
       </div>
       <div class="preview-pane">
         <div class="preview"></div>
@@ -1275,6 +1325,55 @@
   }
 
   btnTheme.addEventListener('click', cycleTheme)
+
+  // Line numbers
+  const btnLinenums = document.getElementById('btn-linenums')
+  const lineNumbersEl = document.getElementById('line-numbers')
+  const editorWrapper = document.querySelector('.editor-wrapper')
+  let lineNumbersEnabled = localStorage.getItem('lineNumbers') === 'true'
+
+  function updateLineNumbers() {
+    if (!lineNumbersEnabled) return
+
+    const lines = editor.value.split('\n').length
+    const numbers = []
+    for (let i = 1; i <= lines; i++) {
+      numbers.push(`<span class="line-num">${i}</span>`)
+    }
+    lineNumbersEl.innerHTML = numbers.join('')
+  }
+
+  function syncLineNumbersScroll() {
+    if (!lineNumbersEnabled) return
+    lineNumbersEl.scrollTop = editor.scrollTop
+  }
+
+  function toggleLineNumbers() {
+    lineNumbersEnabled = !lineNumbersEnabled
+    localStorage.setItem('lineNumbers', lineNumbersEnabled)
+
+    if (lineNumbersEnabled) {
+      lineNumbersEl.classList.add('visible')
+      editorWrapper.classList.add('has-line-numbers')
+      btnLinenums.classList.add('active')
+      updateLineNumbers()
+    } else {
+      lineNumbersEl.classList.remove('visible')
+      editorWrapper.classList.remove('has-line-numbers')
+      btnLinenums.classList.remove('active')
+    }
+  }
+
+  // Initialize line numbers state
+  if (lineNumbersEnabled) {
+    lineNumbersEl.classList.add('visible')
+    editorWrapper.classList.add('has-line-numbers')
+    btnLinenums.classList.add('active')
+  }
+
+  btnLinenums.addEventListener('click', toggleLineNumbers)
+  editor.addEventListener('scroll', syncLineNumbersScroll)
+  editor.addEventListener('input', updateLineNumbers)
 
   // Configure marked with custom renderer
   const renderer = new marked.Renderer()
@@ -1771,6 +1870,7 @@ mindmap
     }
     lastContent = editor.value
     renderMarkdown()
+    updateLineNumbers()
   }
 
   async function save() {
