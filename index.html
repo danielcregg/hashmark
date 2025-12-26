@@ -1023,10 +1023,6 @@
       <span class="icon"><em>I</em></span>
       <span class="label">Italic</span>
     </button>
-    <button data-format="code" aria-label="Code (Ctrl+`)" title="Code">
-      <span class="icon">&lt;/&gt;</span>
-      <span class="label">Code</span>
-    </button>
     <button data-format="link" aria-label="Link (Ctrl+K)" title="Link (Ctrl+K)">
       <span class="icon">🔗</span>
       <span class="label">Link</span>
@@ -1419,7 +1415,6 @@
   const formatActions = {
     bold: () => applyWrap('**', '**', 'bold text'),
     italic: () => applyWrap('_', '_', 'italic text'),
-    code: () => applyWrap('`', '`', 'code'),
     link: () => applyWrap('[', `](${DEFAULT_LINK_URL})`, 'link text'),
     h1: () => applyLinePrefix('# ', 'Heading 1'),
     h2: () => applyLinePrefix('## ', 'Heading 2'),
