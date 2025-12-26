@@ -3,11 +3,11 @@
 
 HashMark is a powerful, feature-rich markdown editor that runs entirely in your browser. It uses the URL hash to store your document, meaning you can share "files" just by sending a link. No database, no accounts, no servers—just you and the client.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://danielcregg.github.io/markdownarea/)
-[![GitHub Pages](https://img.shields.io/badge/hosted-GitHub%20Pages-blue)](https://danielcregg.github.io/markdownarea/)
-[![No Backend](https://img.shields.io/badge/backend-none-orange)](https://danielcregg.github.io/markdownarea/)
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://danielcregg.github.io/hashmark/)
+[![GitHub Pages](https://img.shields.io/badge/hosted-GitHub%20Pages-blue)](https://danielcregg.github.io/hashmark/)
+[![No Backend](https://img.shields.io/badge/backend-none-orange)](https://danielcregg.github.io/hashmark/)
 
-**🚀 Try it now:** [https://danielcregg.github.io/markdownarea/](https://danielcregg.github.io/markdownarea/)
+**🚀 Try it now:** [https://danielcregg.github.io/hashmark/](https://danielcregg.github.io/hashmark/)
 
 ---
 
@@ -94,7 +94,7 @@ Three beautiful themes that persist across sessions:
 
 ## 🚀 Quick Start
 
-1. **Open** the editor at [danielcregg.github.io/markdownarea](https://danielcregg.github.io/markdownarea/)
+1. **Open** the editor at [danielcregg.github.io/hashmark](https://danielcregg.github.io/hashmark/)
 2. **Write** your markdown in the editor pane
 3. **Preview** using Split or Preview mode
 4. **Share** by clicking 📤 Share or 📱 QR Code
@@ -235,5 +235,5 @@ MIT License — feel free to use, modify, and share.
 
 <p align="center">
   Made with ❤️ and JavaScript<br>
-  <a href="https://danielcregg.github.io/markdownarea/">Try it now →</a>
+  <a href="https://danielcregg.github.io/hashmark/">Try it now →</a>
 </p>
