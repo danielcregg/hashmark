@@ -7,7 +7,7 @@ HashMark is a powerful, feature-rich markdown editor that runs entirely in your 
 [![GitHub Pages](https://img.shields.io/badge/hosted-GitHub%20Pages-blue)](https://danielcregg.github.io/hashmark/)
 [![No Backend](https://img.shields.io/badge/backend-none-orange)](https://danielcregg.github.io/hashmark/)
 
-**🚀 Try it now:** [https://danielcregg.github.io/hashmark/](https://danielcregg.github.io/hashmark/)
+**🚀 Try it now:** [https://danielcregg.github.io/hashmark/](https://danielcregg.github.io/hashmark/)  
 **✨ View Sample:** [Click here to see a feature-rich example document](https://danielcregg.github.io/hashmark/#TVPLUtswFN3rK06ABXiwp00fCzrAFFIKU-h0CB3aEiDCvrHVKFKQriGZOOz6BXTZDpv2x_oFfEJHdhm6su498jnnSkeLOCad2hGBLXalLw6kG7Zwf3f7U4ijQnmQYeUImU3LERmG8vBsHWVQBlwQPh7uJ4iiL-QsMsnyQnpKUJee3BW5JIqEWFzE_d3339ghyaUjD8mQeKulSSmgi3ia4FClBXasG0lmZXIRRVtWZ1G0ivM9llql56u4uemyU0PiwtkyL25uVtHfM1oZwrbNqC_EBra0TYeXpeWgo7W9xtSWYcJC5YVWecFQo7F1LMNAZlArKmuSxkk7wYHkAt1yHDZh-Z08ok8ropFZw9IbrGOUnrWXRK20JpaWRE8ZPn9y1lNmwFPQ2SyenLXnyCZYR2_gZDrr-UvHs95Yzeez9jz8U6s9S9CdGpYT7D64C7P3-_2v8kr61Kkxi0Fp0uAQBWltl1cwE0BqjbeaEm3z5YXdAKzi2DqdtRZWXol5oGgknifoKJk7OfJYPiA3kipbCfCoWYvcyXGBo44AgNcnXZaOTxHHG9ia7XkoxrV1Q2XyzXm9ZStg1WfyFbZP3jqS3Dr9D3hvK3ROOnRR5k2703A9OnqR4EheaPKieogEKnRZculRiQprcRzj4SOqJk8dGntU-PPjW93bkZ7_K7uUNjRNo9Z5mWDPMDmZsroi7CvPXsQ4mZxiO9h-DHbo4hTdQro60__qD84OFG8KEcdxQ8luGg5kakvnSQ9a4mmCN5licHguTBMW7QTbWqVDRNH93e2vhjSKRLhqMln9bLQywxBJiYFTZLKW-As)
 
 ---
