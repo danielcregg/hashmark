@@ -429,18 +429,51 @@
     writer.write(byteArray)
     writer.close()
     const buffer = await new Response(stream.readable).arrayBuffer()
-    return new Uint8Array(buffer).toBase64().replace(/\+/g, "-").replace(/\//g, "_")
+    const uint8Array = new Uint8Array(buffer)
+
+    // Use native toBase64 if available, otherwise fallback
+    if (typeof uint8Array.toBase64 === 'function') {
+      return uint8Array.toBase64().replace(/\+/g, "-").replace(/\//g, "_")
+    } else {
+      // Fallback for browsers without toBase64 support
+      const binary = Array.from(uint8Array, byte => String.fromCharCode(byte)).join('')
+      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")
+    }
   }
 
   async function decompress(b64) {
     if (!b64) return ''
-    const byteArray = Uint8Array.fromBase64(b64.replace(/-/g, "+").replace(/_/g, "/"))
-    const stream = new DecompressionStream('deflate-raw')
-    const writer = stream.writable.getWriter()
-    writer.write(byteArray)
-    writer.close()
-    const buffer = await new Response(stream.readable).arrayBuffer()
-    return new TextDecoder().decode(buffer)
+
+    try {
+      // Restore standard base64 format
+      const standardB64 = b64.replace(/-/g, "+").replace(/_/g, "/")
+
+      let byteArray
+      // Use native fromBase64 if available, otherwise fallback
+      if (typeof Uint8Array.fromBase64 === 'function') {
+        byteArray = Uint8Array.fromBase64(standardB64)
+      } else {
+        // Fallback for browsers without fromBase64 support
+        // Add padding if needed
+        const padding = (4 - (standardB64.length % 4)) % 4
+        const paddedB64 = standardB64 + '='.repeat(padding)
+        const binary = atob(paddedB64)
+        byteArray = new Uint8Array(binary.length)
+        for (let i = 0; i < binary.length; i++) {
+          byteArray[i] = binary.charCodeAt(i)
+        }
+      }
+
+      const stream = new DecompressionStream('deflate-raw')
+      const writer = stream.writable.getWriter()
+      writer.write(byteArray)
+      writer.close()
+      const buffer = await new Response(stream.readable).arrayBuffer()
+      return new TextDecoder().decode(buffer)
+    } catch (e) {
+      console.error('Decompression error:', e)
+      return ''
+    }
   }
 
   function debounce(ms, fn) {
