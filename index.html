@@ -354,6 +354,8 @@
   const btnPreview = document.getElementById('btn-preview')
   const btnShare = document.getElementById('btn-share')
   const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)')
+  let mermaidInitialized = false
+  let mermaidTheme = 'default'
 
   // Configure marked
   marked.setOptions({
@@ -571,19 +573,26 @@
     const codeBlocks = preview.querySelectorAll('pre code.language-mermaid')
     if (!codeBlocks.length) return
 
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: prefersDarkMode.matches ? 'dark' : 'default'
-    })
+    const nextTheme = prefersDarkMode.matches ? 'dark' : 'default'
+    if (!mermaidInitialized || mermaidTheme !== nextTheme) {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: nextTheme
+      })
+      mermaidInitialized = true
+      mermaidTheme = nextTheme
+    }
 
+    const targets = []
     codeBlocks.forEach((code) => {
       const pre = code.parentElement
       const container = document.createElement('div')
       container.className = 'mermaid'
       container.textContent = code.textContent
       pre.replaceWith(container)
+      targets.push(container)
     })
 
-    mermaid.init(undefined, preview.querySelectorAll('.mermaid'))
+    mermaid.init(undefined, targets)
   }
 </script>
