@@ -598,7 +598,7 @@
     })
 
     try {
-      mermaid.init({ startOnLoad: false, theme: mermaidTheme }, targets)
+      mermaid.init({ startOnLoad: false }, targets)
     } catch (err) {
       const diagramSummary = conversions
         .map(({ text }, idx) => `#${idx + 1}: ${text.slice(0, MERMAID_SUMMARY_MAX)}`)
@@ -606,7 +606,7 @@
       console.error('Mermaid render error:', err, 'Diagrams:', diagramSummary)
       conversions.forEach(({ container, pre }) => {
         const parent = container.parentNode
-        if (parent && container.isConnected) {
+        if (parent) {
           parent.replaceChild(pre, container)
         } else if (preview && preview.isConnected) {
           preview.appendChild(pre)
