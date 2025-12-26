@@ -808,6 +808,74 @@
       color: #666;
     }
   }
+
+  /* Mermaid Selector Modal */
+  .mermaid-selector {
+    max-width: 400px;
+    width: 90%;
+  }
+
+  .diagram-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .diagram-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 12px;
+    border: 1px solid #d0d7de;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  html[data-theme="dark"] .diagram-option {
+    background: #21262d;
+    border-color: #30363d;
+    color: #c9d1d9;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .diagram-option {
+      background: #21262d;
+      border-color: #30363d;
+      color: #c9d1d9;
+    }
+  }
+
+  .diagram-option:hover {
+    background: #f3f4f6;
+    border-color: #0969da;
+    transform: translateY(-2px);
+  }
+
+  html[data-theme="dark"] .diagram-option:hover {
+    background: #30363d;
+    border-color: #58a6ff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]) .diagram-option:hover {
+      background: #30363d;
+      border-color: #58a6ff;
+    }
+  }
+
+  .diagram-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .diagram-name {
+    font-size: 12px;
+    font-weight: 500;
+  }
 </style>
 
 <div class="toolbar">
@@ -902,6 +970,13 @@
       <span class="icon">―</span>
       <span class="label">Rule</span>
     </button>
+
+    <div class="sidebar-divider"></div>
+
+    <button id="btn-mermaid" aria-label="Mermaid diagram" title="Insert Mermaid diagram">
+      <span class="icon">📊</span>
+      <span class="label">Diagram</span>
+    </button>
   </div>
   <div class="main-content">
     <div class="editor-preview-container">
@@ -927,6 +1002,48 @@
     <h3>Scan to Share</h3>
     <canvas id="qr-canvas"></canvas>
     <button id="close-qr">Close</button>
+  </div>
+</div>
+
+<!-- Mermaid Diagram Selector Modal -->
+<div class="modal-overlay" id="mermaid-modal">
+  <div class="modal mermaid-selector">
+    <h3>Select Diagram Type</h3>
+    <div class="diagram-grid">
+      <button class="diagram-option" data-diagram="flowchart">
+        <span class="diagram-icon">🔀</span>
+        <span class="diagram-name">Flowchart</span>
+      </button>
+      <button class="diagram-option" data-diagram="sequence">
+        <span class="diagram-icon">↔️</span>
+        <span class="diagram-name">Sequence</span>
+      </button>
+      <button class="diagram-option" data-diagram="class">
+        <span class="diagram-icon">📦</span>
+        <span class="diagram-name">Class</span>
+      </button>
+      <button class="diagram-option" data-diagram="state">
+        <span class="diagram-icon">🔄</span>
+        <span class="diagram-name">State</span>
+      </button>
+      <button class="diagram-option" data-diagram="er">
+        <span class="diagram-icon">🗃️</span>
+        <span class="diagram-name">ER Diagram</span>
+      </button>
+      <button class="diagram-option" data-diagram="gantt">
+        <span class="diagram-icon">📅</span>
+        <span class="diagram-name">Gantt</span>
+      </button>
+      <button class="diagram-option" data-diagram="pie">
+        <span class="diagram-icon">🥧</span>
+        <span class="diagram-name">Pie Chart</span>
+      </button>
+      <button class="diagram-option" data-diagram="mindmap">
+        <span class="diagram-icon">🧠</span>
+        <span class="diagram-name">Mind Map</span>
+      </button>
+    </div>
+    <button id="close-mermaid">Cancel</button>
   </div>
 </div>
 
@@ -1197,6 +1314,137 @@
     if (e.target === qrModal) {
       qrModal.classList.remove('active')
     }
+  })
+
+  // Mermaid diagram templates
+  const mermaidTemplates = {
+    flowchart: `\`\`\`mermaid
+flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+    C --> E[End]
+    D --> E
+\`\`\``,
+    sequence: `\`\`\`mermaid
+sequenceDiagram
+    participant A as Alice
+    participant B as Bob
+    A->>B: Hello Bob!
+    B-->>A: Hi Alice!
+    A->>B: How are you?
+    B-->>A: I'm good, thanks!
+\`\`\``,
+    class: `\`\`\`mermaid
+classDiagram
+    class Animal {
+        +String name
+        +int age
+        +makeSound()
+    }
+    class Dog {
+        +String breed
+        +bark()
+    }
+    class Cat {
+        +String color
+        +meow()
+    }
+    Animal <|-- Dog
+    Animal <|-- Cat
+\`\`\``,
+    state: `\`\`\`mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Processing : Start
+    Processing --> Success : Complete
+    Processing --> Error : Fail
+    Success --> [*]
+    Error --> Idle : Retry
+\`\`\``,
+    er: `\`\`\`mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER {
+        string name
+        string email
+    }
+    ORDER {
+        int orderNumber
+        date created
+    }
+    LINE-ITEM {
+        string product
+        int quantity
+    }
+\`\`\``,
+    gantt: `\`\`\`mermaid
+gantt
+    title Project Timeline
+    dateFormat  YYYY-MM-DD
+    section Planning
+    Research       :a1, 2024-01-01, 7d
+    Design         :a2, after a1, 5d
+    section Development
+    Implementation :a3, after a2, 14d
+    Testing        :a4, after a3, 7d
+\`\`\``,
+    pie: `\`\`\`mermaid
+pie showData
+    title Browser Market Share
+    "Chrome" : 65
+    "Firefox" : 15
+    "Safari" : 12
+    "Edge" : 8
+\`\`\``,
+    mindmap: `\`\`\`mermaid
+mindmap
+  root((Project))
+    Planning
+      Research
+      Requirements
+    Development
+      Frontend
+      Backend
+    Testing
+      Unit Tests
+      Integration
+    Deployment
+      Staging
+      Production
+\`\`\``
+  }
+
+  // Mermaid modal elements
+  const mermaidModal = document.getElementById('mermaid-modal')
+  const btnMermaid = document.getElementById('btn-mermaid')
+  const closeMermaid = document.getElementById('close-mermaid')
+  const diagramOptions = document.querySelectorAll('.diagram-option')
+
+  btnMermaid.addEventListener('click', () => {
+    mermaidModal.classList.add('active')
+  })
+
+  closeMermaid.addEventListener('click', () => {
+    mermaidModal.classList.remove('active')
+  })
+
+  mermaidModal.addEventListener('click', (e) => {
+    if (e.target === mermaidModal) {
+      mermaidModal.classList.remove('active')
+    }
+  })
+
+  diagramOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      const diagramType = option.dataset.diagram
+      const template = mermaidTemplates[diagramType]
+      if (template) {
+        insertText('\n' + template + '\n')
+        mermaidModal.classList.remove('active')
+      }
+    })
   })
 
   // Fullscreen
