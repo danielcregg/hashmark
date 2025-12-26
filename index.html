@@ -340,10 +340,10 @@
     <button id="btn-preview">Preview</button>
   </div>
   <div class="toolbar-group">
-    <button data-format="bold" aria-label="Apply bold formatting">Bold</button>
-    <button data-format="italic" aria-label="Apply italic formatting">Italic</button>
-    <button data-format="code" aria-label="Apply inline code formatting">Code</button>
-    <button data-format="link" aria-label="Insert link markdown">Link</button>
+    <button data-format="bold" aria-label="Apply bold formatting (Ctrl+B)">Bold</button>
+    <button data-format="italic" aria-label="Apply italic formatting (Ctrl+I)">Italic</button>
+    <button data-format="code" aria-label="Apply inline code formatting (Ctrl+`)">Code</button>
+    <button data-format="link" aria-label="Insert link markdown (Ctrl+K)">Link</button>
   </div>
   <div class="toolbar-group">
     <button id="btn-share">📤 Share</button>
@@ -406,7 +406,7 @@
       if (action) {
         action()
       } else {
-        console.warn(`Development warning: unknown format action ${button.dataset.format}. Available actions: ${Object.keys(formatActions).join(', ')}`)
+        console.warn('Development warning: unknown format action', button.dataset.format, 'Available actions:', Object.keys(formatActions))
       }
     })
   })
